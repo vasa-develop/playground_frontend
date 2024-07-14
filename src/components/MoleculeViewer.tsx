@@ -6,10 +6,10 @@ import { DefaultPluginSpec } from 'molstar/lib/mol-plugin/spec';
 import 'molstar/build/viewer/molstar.css';
 
 interface MoleculeViewerProps {
-  pdbUrl: string;
+  pdbStr: string;
 }
 
-const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbUrl }) => {
+const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr }) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const plugin = useRef<PluginContext | null>(null);
@@ -37,8 +37,10 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbUrl }) => {
           },
         });
 
-        // Load the structure
-        const data = await plugin.current.builders.data.download({ url: pdbUrl });
+        const data = await plugin.current.builders.data.rawData({
+          data: pdbStr,
+          label: void 0 /* optional label */,
+        });
         const trajectory = await plugin.current.builders.structure.parseTrajectory(data, 'pdb');
         await plugin.current.builders.structure.hierarchy.applyPreset(trajectory, 'default');
       }
@@ -49,7 +51,7 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbUrl }) => {
     return () => {
       plugin.current?.dispose();
     };
-  }, [pdbUrl]);
+  }, [pdbStr]);
 
   return (
     <div ref={parentRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
