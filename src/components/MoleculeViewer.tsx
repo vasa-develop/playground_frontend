@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { PluginContext } from 'molstar/lib/mol-plugin/context';
+import { DefaultPluginSpec } from 'molstar/lib/mol-plugin/spec';
 import 'molstar/build/viewer/molstar.css';
 
 interface MoleculeViewerProps {
@@ -10,29 +12,16 @@ interface MoleculeViewerProps {
 const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr }) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const plugin = useRef<any>(null); // Use any type initially
-  const [PluginContext, setPluginContext] = useState<any>(null);
-  const [DefaultPluginSpec, setDefaultPluginSpec] = useState<any>(null);
+  const plugin = useRef<PluginContext | null>(null);
 
   useEffect(() => {
-    const importMolstar = async () => {
-      const { PluginContext } = await import('molstar/lib/mol-plugin/context');
-      const { DefaultPluginSpec } = await import('molstar/lib/mol-plugin/spec');
-      setPluginContext(() => PluginContext);
-      setDefaultPluginSpec(() => DefaultPluginSpec);
-    };
-
-    importMolstar();
-  }, []);
-
-  useEffect(() => {
-    if (!PluginContext || !DefaultPluginSpec) return;
     if (!parentRef.current || !canvasRef.current) return;
 
     const initViewer = async () => {
       plugin.current = new PluginContext(DefaultPluginSpec());
       await plugin.current.init();
 
+      // Check if canvasRef.current is not null before initializing the viewer
       if (canvasRef.current && parentRef.current) {
         plugin.current.initViewer(canvasRef.current, parentRef.current);
 
@@ -62,7 +51,7 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr }) => {
     return () => {
       plugin.current?.dispose();
     };
-  }, [PluginContext, DefaultPluginSpec, pdbStr]);
+  }, [pdbStr]);
 
   return (
     <div ref={parentRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
