@@ -5,6 +5,7 @@ import {
     Code2,
     CornerDownLeft,
     LifeBuoy,
+    Link,
     Mic,
     Paperclip,
     Rabbit,
@@ -15,6 +16,7 @@ import {
     SquareUser,
     Triangle,
     Turtle,
+    Info, // Add this line
   } from "lucide-react"
   
   import { Badge } from "@/components/ui/badge"
@@ -263,6 +265,14 @@ function Dashboard() {
                     <Input id="temperature" type="number" placeholder="0.4" />
                   </div>
                   <div className="grid gap-3">
+                    <Label htmlFor="top-p">Temperature</Label>
+                    <Input id="top-p" type="number" placeholder="0.7" />
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="top-k">Max Tokens</Label>
+                    <Input id="top-k" type="number" placeholder="0.0" />
+                  </div>
+                  <div className="grid gap-3">
                     <Label htmlFor="top-p">Top P</Label>
                     <Input id="top-p" type="number" placeholder="0.7" />
                   </div>
@@ -315,74 +325,52 @@ function Dashboard() {
           </div>
           <div className="relative flex flex-col items-start gap-8 md:flex">
             <form className="grid w-full items-start gap-6">
+            <fieldset className="grid gap-6 rounded-lg border p-4">
+                <legend className="-ml-1 px-1 text-sm font-medium">
+                  Description
+                </legend>
+                <p>
+                  <a href="https://arcinstitute.org/news/blog/evo" target="_blank" className="underline">Evo</a> is a 7 billion parameter model trained to generate DNA sequences using a context length of 131k tokens, developed by <a href="https://arcinstitute.org/" target="_blank" className="underline">Arc Institute</a>, <a href="https://www.stanford.edu/" target="_blank" className="underline">Stanford</a>, and <a href="https://together.xyz/" target="_blank" className="underline">TogetherAI</a> researchers.
+                </p>
+                <p>
+                 This playground allows you to interact with the Evo model to generate DNA sequences based on the input prompt and parameters you provide.
+                 The generated DNA sequence passed to <a href="https://github.com/hyattpd/Prodigal" target="_blank" className="underline">Prodigal</a> to predict protein coding regions. Finally, the protein sequence is passed to <a href="https://esmatlas.com/" target="_blank" className="underline">ESM</a> to predict protein structure.
+                </p>
+                <p>
+                  The source code for this playground can be found here (<a href="https://github.com/vasa-develop/playground_frontend" target="_blank" className="underline">frontend</a>, <a href="https://github.com/vasa-develop/playground_backend" target="_blank" className="underline">backend</a>). Feel free to <a href="https://vasa.bio" target="_blank" className="underline">reach out</a> if you have any questions or feedback.
+                </p>
+            </fieldset>
               <fieldset className="grid gap-6 rounded-lg border p-4">
                 <legend className="-ml-1 px-1 text-sm font-medium">
                   Settings
                 </legend>
                 <div className="grid gap-3">
-                  <Label htmlFor="model">Model</Label>
-                  <Select>
-                    <SelectTrigger
-                      id="model"
-                      className="items-start [&_[data-description]]:hidden"
-                    >
-                      <SelectValue placeholder="Select a model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="genesis">
-                        <div className="flex items-start gap-3 text-muted-foreground">
-                          <Rabbit className="size-5" />
-                          <div className="grid gap-0.5">
-                            <p>
-                              Neural{" "}
-                              <span className="font-medium text-foreground">
-                                Genesis
-                              </span>
-                            </p>
-                            <p className="text-xs" data-description>
-                              Our fastest model for general use cases.
-                            </p>
-                          </div>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="explorer">
-                        <div className="flex items-start gap-3 text-muted-foreground">
-                          <Bird className="size-5" />
-                          <div className="grid gap-0.5">
-                            <p>
-                              Neural{" "}
-                              <span className="font-medium text-foreground">
-                                Explorer
-                              </span>
-                            </p>
-                            <p className="text-xs" data-description>
-                              Performance and speed for efficiency.
-                            </p>
-                          </div>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="quantum">
-                        <div className="flex items-start gap-3 text-muted-foreground">
-                          <Turtle className="size-5" />
-                          <div className="grid gap-0.5">
-                            <p>
-                              Neural{" "}
-                              <span className="font-medium text-foreground">
-                                Quantum
-                              </span>
-                            </p>
-                            <p className="text-xs" data-description>
-                              The most powerful model for complex computations.
-                            </p>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="temperature">Temperature</Label>
-                  <Input id="temperature" type="number" placeholder="0.4" />
+                    <div className="flex items-center">
+                      <Label htmlFor="top-p">Prompt</Label>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <Info className="ml-2 size-4" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Prompting scheme follows &quot;Greengenes-style lineage strings&quot; with &quot;|&quot; delimiters
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input id="top-p" type="text" placeholder="|d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Escherichia;s__Escherichia|" />
+                </div>  
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-3">
+                    <Label htmlFor="top-p">Temperature</Label>
+                    <Input id="top-p" type="number" placeholder="0.7" />
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="top-k">Max Tokens</Label>
+                    <Input id="top-k" type="number" placeholder="0.0" />
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-3">
@@ -395,37 +383,11 @@ function Dashboard() {
                   </div>
                 </div>
               </fieldset>
-              <fieldset className="grid gap-6 rounded-lg border p-4">
-                <legend className="-ml-1 px-1 text-sm font-medium">
-                  Messages
-                </legend>
-                <div className="grid gap-3">
-                  <Label htmlFor="role">Role</Label>
-                  <Select defaultValue="system">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="system">System</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="assistant">Assistant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="content">Content</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="You are a..."
-                    className="min-h-[9.5rem]"
-                  />
-                </div>
-              </fieldset>
             </form>
           </div>
           <div className="flex items-start h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 md:col-span-3">
             <Badge variant="outline">
-              Predicted DNA Sequence via Evo and Predicted protein coding regions via Prodigal
+              Predicted DNA Sequence via Evo and Predicted &nbsp;<span style={{background : "yellow"}}>protein coding regions</span>&nbsp; via Prodigal
             </Badge>
             <SequenceViewer sequence={DNA_SEQUENCE} />
             <div className="flex-1" />
