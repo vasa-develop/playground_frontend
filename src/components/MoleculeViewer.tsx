@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PluginContext } from 'molstar/lib/mol-plugin/context';
 import { DefaultPluginSpec } from 'molstar/lib/mol-plugin/spec';
-
 import { ElementIndex, StructureElement, StructureProperties } from 'molstar/lib/mol-model/structure';
 import { StateSelection } from 'molstar/lib/mol-state';
 import { PluginStateObject as PSO } from 'molstar/lib/mol-plugin-state/objects';
@@ -179,7 +178,7 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr, sequence }) => 
   };
 
   return (
-    <div>
+    <div className="w-full">
       <SequenceViewerWithControls 
         sequence={sequence} 
         onAminoAcidClick={handleAminoAcidClick} 
@@ -187,7 +186,7 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr, sequence }) => 
         clickedResidue={clickedResidue}
         hoveredResidue={hoveredResidue}
       />
-      <div ref={parentRef} style={{ position: 'relative', width: '100%', height: '400px' }}>
+      <div ref={parentRef} style={{ position: 'relative', width: '100%', height: '400px', marginTop: '20px' }}>
         <canvas
           ref={canvasRef}
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'transparent' }}
