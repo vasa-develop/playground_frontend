@@ -356,7 +356,7 @@ return (
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <Input id="top-p" type="text" placeholder="|d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Escherichia;s__Escherichia|" />
+                  <Input id="prompt" type="text" placeholder="|d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Escherichia;s__Escherichia|" />
               </div>  
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-3">

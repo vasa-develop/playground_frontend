@@ -7,16 +7,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export const SequenceViewer: React.FC<{sequence: string;}> = ({ sequence }) => {    
+export const SequenceViewer: React.FC<{sequence: string; protein_coding_sequence_indices: {start: number, end: number}[]}> = ({ sequence, protein_coding_sequence_indices }) => {    
     const charsPerLine = 90; // Adjust this to match your desired line length
     const numberingInterval = 10; // Show a number every 10 positions
-
-    const PROTEIN_CODING_SEQUENCE_INDICES = [
-        {
-            "start": 0, // Adjusted to 0-based index
-            "end": 612
-        }
-    ];
   
     // Split the sequence into lines
     const lines = sequence.match(new RegExp(`.{1,${charsPerLine}}`, 'g')) || [];
@@ -48,7 +41,7 @@ export const SequenceViewer: React.FC<{sequence: string;}> = ({ sequence }) => {
     };
   
     const isProteinCoding = (index: number) => {
-      return PROTEIN_CODING_SEQUENCE_INDICES.some(range => index >= range.start && index <= range.end);
+      return protein_coding_sequence_indices.some(range => index >= range.start && index <= range.end);
     };
   
     return (

@@ -20,12 +20,21 @@ interface MoleculeViewerProps {
   sequence: string;
 }
 
+const transformSequence = (sequence: string): string => {
+  // Extract the sequence part after the metadata
+  const sequencePart = sequence.split('\n')[1];
+  // Remove any special characters or whitespace
+  return sequencePart.replace(/[^A-Z]/g, '');
+};
+
 const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr, sequence }) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const plugin = useRef<PluginContext | null>(null);
   const [clickedResidue, setClickedResidue] = useState<number | null>(null);
   const [hoveredResidue, setHoveredResidue] = useState<number | null>(null);
+
+  sequence = transformSequence(sequence);
 
   useEffect(() => {
     if (!parentRef.current || !canvasRef.current) return;
@@ -48,8 +57,12 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr, sequence }) => 
           },
         });
 
-        const url = 'https://files.rcsb.org/view/1CRN.pdb';
-        const data = await plugin.current.builders.data.download({ url }, { state: { isGhost: true } });
+        // const url = 'https://files.rcsb.org/view/1CRN.pdb';
+        // const data = await plugin.current.builders.data.download({ url }, { state: { isGhost: true } });
+        const data = await plugin.current.builders.data.rawData({
+          data: pdbStr,
+          label: void 0 /* optional label */,
+        });
         const trajectory = await plugin.current.builders.structure.parseTrajectory(data, 'pdb');
         await plugin.current.builders.structure.hierarchy.applyPreset(trajectory, 'default');
       }

@@ -1,3 +1,5 @@
+"use client"
+
 import {
     Bird,
     Book,
@@ -16,7 +18,7 @@ import {
     SquareUser,
     Triangle,
     Turtle,
-    Info, // Add this line
+    Info,
   } from "lucide-react"
   
   import { Badge } from "@/components/ui/badge"
@@ -46,14 +48,127 @@ import {
     TooltipTrigger,
   } from "@/components/ui/tooltip"
 import dynamic from "next/dynamic"
-import { DNA_SEQUENCE, SAMPLE_PDB_STR, SAMPLE_SEQUENCE } from "../constants"
+import { DNA_SEQUENCE, SAMPLE_PDB_STR, SAMPLE_SEQUENCE, PROTEIN_CODING_SEQUENCE_INDICES } from "../constants"
 import { SequenceViewer } from "@/components/SequenceViewer"
+import { useState } from "react";
+import axios from "axios";
   
 function Dashboard() {
   const DynamicMoleculeViewer = dynamic(() => import('../../components/MoleculeViewer'), {
     ssr: false,
     loading: () => <p>Loading viewer...</p>
   });
+
+  const placeholderValue = "|d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Escherichia;s__Escherichia|";
+  const [prompt, setPrompt] = useState(placeholderValue);
+  const [badgeText, setBadgeText] = useState("Copy Example");
+  const [temperature, setTemperature] = useState(1.0);
+  const [maxTokens, setMaxTokens] = useState(1024);
+  const [topP, setTopP] = useState(1.0);
+  const [topK, setTopK] = useState(4);
+  const [dna_sequence, setDnaSequence] = useState(DNA_SEQUENCE);
+  const [proteinCodingSequenceIndices, setProteinCodingSequenceIndices] = useState<{start: number, end: number}[]>(PROTEIN_CODING_SEQUENCE_INDICES);
+  const [proteinSequences, setProteinSequences] = useState<string>(SAMPLE_SEQUENCE);
+  const [proteinStructure, setProteinStructure] = useState<string>(SAMPLE_PDB_STR);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(placeholderValue);
+    setBadgeText("Copied!");
+    setTimeout(() => setBadgeText("Copy Example"), 2000); // Reset after 2 seconds
+  };
+
+  const handleTemperatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (value >= 0 && value <= 2.0) {
+      setTemperature(value);
+    }
+  };
+
+  const handleMaxTokensChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (value >= 0 && value <= 2048) {
+      setMaxTokens(value);
+    }
+  };
+
+  const handleTopPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (value >= 0.0 && value <= 1.0) {
+      setTopP(value);
+    }
+  };
+
+  const handleTopKChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (value >= 0 && value <= 100) {
+      setTopK(value);
+    }
+  };
+
+  const updateDnaSequence = (new_dna_sequence: string) => {
+    setDnaSequence(new_dna_sequence);
+  }
+
+  const handleGenerate = async () => {
+    console.log(prompt, maxTokens, temperature, topK, topP);
+    try {
+      const response = await axios.post('http://13.52.72.81:8000/generate_dna', {
+        prompt,
+        max_tokens: maxTokens,
+        temperature,
+        top_k: topK,
+        top_p: topP
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const generate_dna_response = response.data as {"dna_sequence": string};
+      updateDnaSequence(generate_dna_response.dna_sequence);
+      await predictGenes(generate_dna_response.dna_sequence); // Call the new function here
+
+    } catch (error) {
+      console.error("Error generating DNA and Protein sequence:", error);
+    }
+  };
+
+  const predictGenes = async (dna_sequence: string) => {
+    try {
+      const response = await axios.post('http://13.52.72.81:8000/predict_genes', {
+        dna_sequence
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const predicted_genes_response = response.data as {
+        "protein_coding_sequence_indices": {start: number, end: number}[],
+        "protein_coding_sequences": string[],
+        "protein_sequences": string
+      };
+      setProteinCodingSequenceIndices(predicted_genes_response.protein_coding_sequence_indices);
+      setProteinSequences(predicted_genes_response.protein_sequences);
+      await predictProteinStructure(predicted_genes_response.protein_sequences); // Call the new function here
+    } catch (error) {
+      console.error("Error predicting genes:", error);
+    }
+  };
+
+  const predictProteinStructure = async (protein_sequences: string) => {
+    try {
+      const response = await axios.post('http://13.52.72.81:8000/predict_protein_structure', {
+        protein_sequences
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const predicted_protein_structure_response = response.data as {"protein_structure": string};
+      setProteinStructure(predicted_protein_structure_response.protein_structure);
+    } catch (error) {
+      console.error("Error predicting protein structure:", error);
+    }
+  };
 
   return (
     <div className="grid h-screen w-full pl-[53px]">
@@ -320,7 +435,7 @@ function Dashboard() {
             <Badge variant="outline">
               Predicted Protein Structure via ESM
             </Badge>
-            <DynamicMoleculeViewer pdbStr={SAMPLE_PDB_STR} sequence={SAMPLE_SEQUENCE} />
+            <DynamicMoleculeViewer pdbStr={proteinStructure} sequence={proteinSequences} />
             <div className="flex-1" />
           </div>
           <div className="relative flex flex-col items-start gap-8 md:flex">
@@ -346,7 +461,7 @@ function Dashboard() {
                 </legend>
                 <div className="grid gap-3">
                     <div className="flex items-center">
-                      <Label htmlFor="top-p">Prompt</Label>
+                      <Label htmlFor="prompt">Prompt</Label>
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
@@ -359,29 +474,133 @@ function Dashboard() {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                      <Badge className="ml-2 cursor-pointer bg-gray-200 text-black" onClick={copyToClipboard}>
+                        {badgeText}
+                      </Badge>
                     </div>
-                    <Input id="top-p" type="text" placeholder="|d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Escherichia;s__Escherichia|" />
+                    <Input
+                      id="prompt"
+                      type="text"
+                      placeholder={placeholderValue}
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                    />
                 </div>  
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-3">
-                    <Label htmlFor="top-p">Temperature</Label>
-                    <Input id="top-p" type="number" placeholder="0.7" />
+                    <div className="flex items-center">
+                      <Label htmlFor="temperature">Temperature</Label>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <Info className="ml-2 size-4" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Controls the randomness of the output. Higher values result in more diverse responses (min: 0.0, max: 2.0)
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      id="temperature"
+                      type="number"
+                      placeholder="0.7"
+                      min="0"
+                      max="2.0"
+                      step="0.1"
+                      value={temperature}
+                      onChange={handleTemperatureChange}
+                    />
                   </div>
                   <div className="grid gap-3">
-                    <Label htmlFor="top-k">Max Tokens</Label>
-                    <Input id="top-k" type="number" placeholder="0.0" />
+                    <div className="flex items-center">
+                      <Label htmlFor="max-tokens">Max Tokens</Label>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <Info className="ml-2 size-4" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Specifies the max length of the model&apos;s generated output. Higher values allow for longer responses (min: 0, max: 2048)
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      id="max-tokens"
+                      type="number"
+                      placeholder="0"
+                      min="0"
+                      max="2048"
+                      step="1"
+                      value={maxTokens}
+                      onChange={handleMaxTokensChange}
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-3">
-                    <Label htmlFor="top-p">Top P</Label>
-                    <Input id="top-p" type="number" placeholder="0.7" />
+                    <div className="flex items-center">
+                      <Label htmlFor="top-p">Top P</Label>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <Info className="ml-2 size-4" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Adjusts variety in responses by considering only the most likely words up to a set threshold. Higher values result in more diverse responses (min: 0.0, max: 1.0)
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      id="top-p"
+                      type="number"
+                      placeholder="0.7"
+                      min="0.0"
+                      max="1.0"
+                      step="0.1"
+                      value={topP}
+                      onChange={handleTopPChange}
+                    />
                   </div>
                   <div className="grid gap-3">
-                    <Label htmlFor="top-k">Top K</Label>
-                    <Input id="top-k" type="number" placeholder="0.0" />
+                    <div className="flex items-center">
+                      <Label htmlFor="top-k">Top K</Label>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <Info className="ml-2 size-4" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Limits variety by selecting from the top &apos;k&apos; most likely next words. Higher values result in more diverse responses (min: 0, max: 100)
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      id="top-k"
+                      type="number"
+                      placeholder="0.0"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={topK}
+                      onChange={handleTopKChange}
+                    />
                   </div>
                 </div>
+                <Button variant="default" type="button" onClick={handleGenerate}>
+                  Generate DNA and Protein sequence
+                </Button>
               </fieldset>
             </form>
           </div>
@@ -389,7 +608,7 @@ function Dashboard() {
             <Badge variant="outline">
               Predicted DNA Sequence via Evo and Predicted &nbsp;<span style={{background : "yellow"}}>protein coding regions</span>&nbsp; via Prodigal
             </Badge>
-            <SequenceViewer sequence={DNA_SEQUENCE} />
+            <SequenceViewer sequence={dna_sequence} protein_coding_sequence_indices={proteinCodingSequenceIndices} />
             <div className="flex-1" />
           </div>
         </main>
