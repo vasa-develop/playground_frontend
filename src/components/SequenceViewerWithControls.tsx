@@ -10,8 +10,6 @@ interface SequenceViewerProps {
 }
 
 export const SequenceViewerWithControls: React.FC<SequenceViewerProps> = ({ sequence, onAminoAcidClick, onAminoAcidHover, clickedResidue, hoveredResidue }) => {
-    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-    
     const charsPerLine = 60; // Adjust this to match your desired line length
     const numberingInterval = 10; // Show a number every 10 positions
   
@@ -65,18 +63,12 @@ export const SequenceViewerWithControls: React.FC<SequenceViewerProps> = ({ sequ
                     <span
                       key={index}
                       onClick={() => onAminoAcidClick(index)}
-                      onMouseEnter={() => {
-                        setHoveredIndex(index)
-                        onAminoAcidHover(index)
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredIndex(null)
-                        onAminoAcidHover(null)
-                      }}
+                      onMouseEnter={() => onAminoAcidHover(index)}
+                      onMouseLeave={() => onAminoAcidHover(null)}
                       style={{ 
                         cursor: 'pointer', 
                         padding: '2px', 
-                        backgroundColor: hoveredResidue === index || clickedResidue === index ? '#B280FF' : (index % 2 === 0 ? '#f0f0f0' : 'white'),
+                        backgroundColor: hoveredResidue === index ? '#B280FF' : (index % 2 === 0 ? '#f0f0f0' : 'white'),
                         transition: 'background-color 0.3s'
                       }}
                     >

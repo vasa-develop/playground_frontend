@@ -11,8 +11,6 @@ import { Vec3 } from 'molstar/lib/mol-math/linear-algebra';
 import { Sphere3D } from 'molstar/lib/mol-math/geometry';
 import { Loci } from 'molstar/lib/mol-model/loci';
 import { ColorNames } from 'molstar/lib/mol-util/color/names';
-// import { ElementIndex } from 'molstar/lib/mol-model/structure/structure/element';
-
 import 'molstar/build/viewer/molstar.css';
 import { SequenceViewerWithControls } from './SequenceViewerWithControls';
 import { OrderedSet } from 'molstar/lib/mol-data/int';
@@ -51,10 +49,6 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr, sequence }) => 
           },
         });
 
-        // const data = await plugin.current.builders.data.rawData({
-        //   data: pdbStr,
-        //   label: undefined,
-        // });
         const url = 'https://files.rcsb.org/view/1CRN.pdb';
         const data = await plugin.current.builders.data.download({ url }, { state: { isGhost: true } });
         const trajectory = await plugin.current.builders.structure.parseTrajectory(data, 'pdb');
@@ -181,6 +175,7 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr, sequence }) => 
       setClickedResidue(null); // Clear the clicked residue when hovering over a new character
     }
     highlightResidue(index);
+    setHoveredResidue(index); // Update hoveredResidue state
   };
 
   return (
