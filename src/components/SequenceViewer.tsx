@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export const SequenceViewer: React.FC<{sequence: string;}> = ({ sequence }) => {    
-    const charsPerLine = 60; // Adjust this to match your desired line length
+    const charsPerLine = 90; // Adjust this to match your desired line length
     const numberingInterval = 10; // Show a number every 10 positions
 
     const PROTEIN_CODING_SEQUENCE_INDICES = [
