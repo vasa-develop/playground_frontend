@@ -19,6 +19,9 @@ import {
     Triangle,
     Turtle,
     Info,
+    Twitter,
+    Github,
+    Home
   } from "lucide-react"
   
   import { Badge } from "@/components/ui/badge"
@@ -174,11 +177,31 @@ function Dashboard() {
     <div className="grid h-screen w-full pl-[53px]">
       <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
         <div className="border-b p-2">
-          <Button variant="outline" size="icon" aria-label="Home">
-            <Triangle className="size-5 fill-foreground" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href="https://vasa.bio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="mt-auto rounded-lg"
+                    aria-label="Home"
+                  >
+                    <Home className="size-5" />
+                  </Button>
+                </a>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={5}>
+                Home
+              </TooltipContent>
+            </Tooltip>
+            </TooltipProvider>
         </div>
-        <nav className="grid gap-1 p-2">
+        {/* <nav className="grid gap-1 p-2">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -256,37 +279,49 @@ function Dashboard() {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </nav>
+        </nav> */}
         <nav className="mt-auto grid gap-1 p-2">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="mt-auto rounded-lg"
-                  aria-label="Help"
+                <a
+                  href="https://twitter.com/vasa_develop"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <LifeBuoy className="size-5" />
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="mt-auto rounded-lg"
+                    aria-label="Twitter"
+                  >
+                    <Twitter className="size-5" />
+                  </Button>
+                </a>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={5}>
-                Help
+                Twitter
               </TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="mt-auto rounded-lg"
-                  aria-label="Account"
+                <a
+                  href="https://github.com/vasa-develop/playground_frontend"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <SquareUser className="size-5" />
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="mt-auto rounded-lg"
+                    aria-label="Github"
+                  >
+                    <Github className="size-5" />
+                  </Button>
+                </a>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={5}>
-                Account
+                Github
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

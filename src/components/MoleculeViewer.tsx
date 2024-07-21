@@ -199,7 +199,7 @@ const MoleculeViewer: React.FC<MoleculeViewerProps> = ({ pdbStr, sequence }) => 
         clickedResidue={clickedResidue}
         hoveredResidue={hoveredResidue}
       />
-      <div ref={parentRef} style={{ position: 'relative', width: '100%', height: '500px', marginTop: '20px' }}>
+      <div ref={parentRef} style={{ position: 'relative', width: '100%', height: '620px', marginTop: '20px' }}>
         <canvas
           ref={canvasRef}
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'transparent' }}
