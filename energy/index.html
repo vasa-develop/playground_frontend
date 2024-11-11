@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FermiNet Energy Convergence Visualization</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #plot {
+            width: 100%;
+            height: 100vh;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: black;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .control-panel {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">FermiNet Energy Convergence Visualization</div>
+    <div class="control-panel">
+        <button onclick="generateNewData()">Generate New Data</button>
+    </div>
+    <div id="plot"></div>
+    <script>
+        // Generate mock training data (in real implementation, this would come from train_stats.csv)
+        function generateTrainingData(iterations = 1000) {
+            const data = [];
+            let energy = -0.5; // Starting close to ground state energy of hydrogen
+
+            for (let i = 0; i < iterations; i++) {
+                // Add some noise and convergence behavior
+                const noise = 0.01 * Math.random();
+                const convergence = 0.1 * Math.exp(-i/200);
+                energy = energy * (1 + noise * convergence);
+
+                data.push({
+                    iteration: i,
+                    energy: energy,
+                    moving_avg: energy // In real implementation, calculate actual moving average
+                });
+            }
+            return data;
+        }
+
+        // Create the visualization
+        function createVisualization(data) {
+            const iterations = data.map(d => d.iteration);
+            const energies = data.map(d => d.energy);
+            const movingAvg = data.map(d => d.moving_avg);
+
+            const traces = [
+                {
+                    x: iterations,
+                    y: energies,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Energy',
+                    line: {
+                        color: 'rgb(31, 119, 180)',
+                        width: 1
+                    }
+                },
+                {
+                    x: iterations,
+                    y: movingAvg,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Moving Average',
+                    line: {
+                        color: 'rgb(255, 127, 14)',
+                        width: 2
+                    }
+                }
+            ];
+
+            const layout = {
+                title: 'Energy Convergence During Training',
+                xaxis: {
+                    title: 'Training Iteration'
+                },
+                yaxis: {
+                    title: 'Energy (Hartree)',
+                    hoverformat: '.4f'
+                },
+                showlegend: true,
+                legend: {
+                    x: 0.7,
+                    y: 0.1
+                }
+            };
+
+            Plotly.newPlot('plot', traces, layout);
+        }
+
+        // Generate new data and update plot
+        function generateNewData() {
+            const data = generateTrainingData();
+            createVisualization(data);
+        }
+
+        // Initial visualization
+        generateNewData();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            Plotly.Plots.resize('plot');
+        });
+    </script>
+</body>
+</html>
