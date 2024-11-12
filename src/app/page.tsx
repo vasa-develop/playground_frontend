@@ -14,7 +14,7 @@ export default function Home() {
               <li key={project.path} className="space-y-2">
                 <div className="flex items-baseline">
                   <code className="text-sm">
-                    <a href={project.path} className="no-underline hover:underline">
+                    <a href={project.path} className="text-pink-500 no-underline hover:underline">
                       {project.title.toLowerCase()}
                     </a>
                   </code>
