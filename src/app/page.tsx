@@ -7,17 +7,17 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-6 max-w-2xl">
-        <article>
+        <article className="mx-0">
           <h3 className="mb-6"><em>Main Projects</em></h3>
           <ul className="space-y-3">
             {projectCatalog.mainProjects.map((project) => (
-              <li key={project.path} className="flex items-baseline gap-2">
+              <li key={project.path} className="flex items-baseline gap-2 font-cmunrm">
                 <code className="project-name">
                   <a href={project.path} className="no-underline hover:underline">
                     {project.title.toLowerCase()}:
                   </a>
                 </code>
-                <span>{project.description}</span>
+                <span className="font-cmunrm">{project.description}</span>
               </li>
             ))}
           </ul>

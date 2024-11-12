@@ -45,6 +45,15 @@
     word-break: break-word;
     font-family: monospace;
   }
+
+  /* Add specific rules for project descriptions */
+  main article ul li {
+    font-family: 'cmunrm', serif !important;
+  }
+
+  main article ul li span {
+    font-family: 'cmunrm', serif !important;
+  }
 }
 
 @media (max-width: 640px) {
