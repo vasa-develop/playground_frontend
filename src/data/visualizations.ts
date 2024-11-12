@@ -11,22 +11,6 @@ export const projectCatalog: ProjectCatalog = {
       isVisualization: true
     },
     {
-      title: "Test",
-      description: "Testing environment for DNA/protein sequence generation",
-      path: "/test",
-      techStack: ["React", "API Integration"],
-      features: ["Parameter Testing", "Sequence Generation", "Dashboard Interface"],
-      isVisualization: true
-    },
-    {
-      title: "Toy Evo",
-      description: "Simplified DNA sequence generation and visualization",
-      path: "/toy_evo",
-      techStack: ["React"],
-      features: ["DNA Viewer", "Color-coded Bases", "Interactive Interface"],
-      isVisualization: true
-    },
-    {
       title: "FermiNet",
       description: "Quantum mechanical visualizations and simulations",
       path: "/ferminet",
