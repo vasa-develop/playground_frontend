@@ -1,37 +1,16 @@
-/* CMU Roman Font */
-@font-face {
-  font-family: 'Computer Modern';
-  src: url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern/files/computer-modern-roman-normal.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern/files/computer-modern-roman-normal.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: block;
-}
-
-/* Add italic variant */
-@font-face {
-  font-family: 'Computer Modern';
-  src: url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern/files/computer-modern-roman-italic.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern/files/computer-modern-roman-italic.woff') format('woff');
-  font-weight: normal;
-  font-style: italic;
-  font-display: block;
-}
-
-/* Add bold variant */
-@font-face {
-  font-family: 'Computer Modern';
-  src: url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern/files/computer-modern-roman-bold.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern/files/computer-modern-roman-bold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-  font-display: block;
-}
+/* CMU Serif Font */
+@import url('https://fonts.googleapis.com/css2?family=CMU+Serif:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root {
-  font-family: 'Computer Modern', serif !important;
+  font-family: 'CMU Serif', serif !important;
 }
 
 * {
   font-family: inherit;
+}
+
+/* Ensure proper font loading behavior */
+html {
+  opacity: 1;
+  visibility: visible;
 }
