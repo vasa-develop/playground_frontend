@@ -1,0 +1,32 @@
+/* CMU Roman Font */
+@font-face {
+  font-family: 'CMU Roman';
+  src: url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunrm.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunrm.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunrm.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Add italic variant */
+@font-face {
+  font-family: 'CMU Roman';
+  src: url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunti.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunti.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunti.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Add bold variant */
+@font-face {
+  font-family: 'CMU Roman';
+  src: url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunbx.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunbx.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts/Serif/cmunbx.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
