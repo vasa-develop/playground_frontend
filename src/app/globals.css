@@ -19,12 +19,14 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'cmunrm', serif;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
 
+  /* Remove redundant font-family declaration since it's inherited */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'cmunrm', serif;
+    font-family: inherit;
   }
 }
 

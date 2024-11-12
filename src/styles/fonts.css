@@ -7,8 +7,9 @@
   font-display: swap;
 }
 
+/* Remove !important and let proper CSS specificity handle font application */
 :root {
-  font-family: 'cmunrm', serif !important;
+  font-family: 'cmunrm', serif;
 }
 
 * {

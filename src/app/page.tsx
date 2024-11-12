@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-6 max-w-2xl font-cmunrm">
+      <main className="flex-grow container mx-auto px-4 py-6 max-w-2xl">
         <article>
           <h3 className="mb-6"><em>Main Projects</em></h3>
           <ul className="space-y-3">
@@ -17,7 +17,7 @@ export default function Home() {
                     {project.title.toLowerCase()}:
                   </a>
                 </code>
-                <span className="font-cmunrm">{project.description}</span>
+                <span>{project.description}</span>
               </li>
             ))}
           </ul>
