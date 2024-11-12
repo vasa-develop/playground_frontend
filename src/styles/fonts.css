@@ -1,8 +1,14 @@
-/* CMU Serif Font */
-@import url('https://fonts.googleapis.com/css2?family=CMU+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+/* CMU Roman Font */
+@font-face {
+  font-family: 'cmunrm';
+  src: url('/fonts/cmunrm.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  font-family: 'CMU Serif', serif !important;
+  font-family: 'cmunrm', serif !important;
 }
 
 * {

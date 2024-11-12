@@ -68,13 +68,22 @@
   }
   html {
     @apply scroll-smooth;
-    font-family: 'Computer Modern', serif !important;
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Computer Modern', serif !important;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
+  }
+}
+
+@layer components {
+  .project-name {
+    border-radius: 5px;
+    background-color: rgba(135,131,120,.15);
+    color: #ff4081;
+    font-size: .9em;
+    padding: .2em .4em;
+    word-break: break-word;
   }
 }
 
