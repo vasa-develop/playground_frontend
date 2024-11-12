@@ -1,7 +1,7 @@
-@import '../styles/fonts.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import '../styles/fonts.css';
 
 @layer base {
   :root {
@@ -68,11 +68,11 @@
   }
   html {
     @apply scroll-smooth;
-    font-family: 'cmunrm', serif;
+    font-family: 'cmunrm', serif !important;
   }
   body {
     @apply bg-background text-foreground;
-    /* font-feature-settings: "rlig" 1, "calt" 1; */
+    font-family: 'cmunrm', serif !important;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
