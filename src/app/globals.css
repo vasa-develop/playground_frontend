@@ -1,7 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import '../styles/fonts.css';
+
+@font-face {
+  font-family: 'cmunrm';
+  src: url('/fonts/cmunrm.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 @layer base {
   :root {
@@ -14,19 +21,17 @@
   }
 
   html {
-    @apply scroll-smooth;
+    @apply scroll-smooth font-cmunrm;
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'cmunrm', serif;
+    @apply bg-background text-foreground font-cmunrm;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
 
-  /* Remove redundant font-family declaration since it's inherited */
   h1, h2, h3, h4, h5, h6 {
-    font-family: inherit;
+    @apply font-cmunrm;
   }
 }
 

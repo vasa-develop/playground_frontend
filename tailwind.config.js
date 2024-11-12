@@ -61,7 +61,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", ...fontFamily.sans],
-        // mono: ["var(--font-mono)", ...fontFamily.mono],
+        cmunrm: ["cmunrm", "serif"],
       },
       keyframes: {
         "accordion-down": {
