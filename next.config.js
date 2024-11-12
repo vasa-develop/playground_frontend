@@ -2,13 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Configure for app directory
   experimental: {
     appDir: true,
-  },
-  // Ensure client-side components work properly
-  compiler: {
-    styledComponents: true,
-  },
+  }
 }
 
 module.exports = nextConfig
