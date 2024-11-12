@@ -1,6 +1,6 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { ProjectCard } from '@/components/VisualizationCard';
+import { ProjectCard } from '@/components/ProjectCard';
 import { projectCatalog } from '@/data/visualizations';
 
 export default function Home() {
