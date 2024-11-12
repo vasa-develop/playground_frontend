@@ -19,7 +19,7 @@ export function Footer() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        devin
+        devin ai
       </a>
     </footer>
   );
