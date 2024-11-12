@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "cmunrm";
+  src: url("/fonts/cmunrm.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -61,21 +69,6 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  html {
-    @apply scroll-smooth;
-  }
-  body {
-    @apply bg-background text-foreground;
-    /* font-feature-settings: "rlig" 1, "calt" 1; */
-    font-synthesis-weight: none;
-    text-rendering: optimizeLegibility;
-  }
-}
-
 @layer utilities {
   .step {
     counter-increment: step;
@@ -94,6 +87,57 @@
   .chunk-container::after {
     content: "";
     @apply absolute -inset-4 shadow-xl rounded-xl border;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth font-cmunrm;
+  }
+
+  body {
+    @apply bg-background text-foreground font-cmunrm;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-cmunrm;
+  }
+}
+
+@layer components {
+  .project-name {
+    border-radius: 5px;
+    background-color: rgba(135, 131, 120, 0.15);
+    color: #ff4081;
+    font-size: 0.9em;
+    padding: 0.2em 0.4em;
+    word-break: break-word;
+    font-family: monospace;
+  }
+
+  /* Add specific rules for project descriptions */
+  main article ul li {
+    font-family: "cmunrm", serif !important;
+  }
+
+  main article ul li span {
+    font-family: "cmunrm", serif !important;
+  }
+
+  /* Add specific rule for footer */
+  footer {
+    font-family: "cmunrm", serif !important;
   }
 }
 
