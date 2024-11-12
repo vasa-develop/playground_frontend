@@ -68,11 +68,11 @@
   }
   html {
     @apply scroll-smooth;
-    font-family: 'cmunrm', serif !important;
+    font-family: 'Computer Modern', serif !important;
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'cmunrm', serif !important;
+    font-family: 'Computer Modern', serif !important;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
