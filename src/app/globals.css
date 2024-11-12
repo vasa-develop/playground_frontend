@@ -54,6 +54,11 @@
   main article ul li span {
     font-family: 'cmunrm', serif !important;
   }
+
+  /* Add specific rule for footer */
+  footer {
+    font-family: 'cmunrm', serif !important;
+  }
 }
 
 @media (max-width: 640px) {
