@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Footer() {
   return (
-    <footer className="w-full py-4 text-sm text-gray-600">
+    <footer className="w-full py-8 text-sm text-gray-600 text-center mt-auto">
       built with <span className="text-red-500">❤</span> by{" "}
       <a
         href="https://x.com/vasa_develop"
