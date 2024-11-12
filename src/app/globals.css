@@ -68,7 +68,7 @@
   }
   html {
     @apply scroll-smooth;
-    font-family: 'CMU Roman', serif;
+    font-family: 'cmunrm', serif;
   }
   body {
     @apply bg-background text-foreground;
