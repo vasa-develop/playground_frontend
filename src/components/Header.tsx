@@ -3,7 +3,7 @@ import React from 'react';
 export function Header() {
   return (
     <header className="w-full py-6">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-8">
         <div className="flex flex-col items-start">
           <h1 className="text-3xl">
             playground
