@@ -1,5 +1,5 @@
-export const API_BASE_URL = process.env.NODE_ENV === 'production' ? 'http://3.83.244.93:8000' : 'http://localhost:8000';
-export const WS_BASE_URL = process.env.NODE_ENV === 'production' ? 'ws://3.83.244.93:8000' : 'ws://localhost:8000';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+export const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
 
 export interface Unit {
   position: [number, number];
