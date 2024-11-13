@@ -1,8 +1,21 @@
+'use client';
+
 import React, { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Rect, Text } from 'react-konva';
+import dynamic from 'next/dynamic';
 import { useInterval } from 'react-use';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import * as Toggle from '@radix-ui/react-toggle';
+
+// Dynamically import Konva components with SSR disabled
+const Stage = dynamic(() => import('react-konva').then((mod) => mod.Stage), {
+  ssr: false,
+});
+const Layer = dynamic(() => import('react-konva').then((mod) => mod.Layer), {
+  ssr: false,
+});
+const Rect = dynamic(() => import('react-konva').then((mod) => mod.Rect), {
+  ssr: false,
+});
 
 interface BreakoutProps {
   gameState: number[][][];
