@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize the Gemini API with the API key
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_AI_STUDIO_API_KEY || '');
+const genAI = new GoogleGenerativeAI(process.env.google_gemini_GOOGLE_AI_STUDIO_API_KEY || '');
 
 // Create a client for text generation
 export async function generateText(prompt: string) {
