@@ -14,6 +14,7 @@ interface BreakoutGameState {
   done: boolean;
   info: {
     lives: number;
+    score: number;
     episode_frame_number: number;
     frame_number: number;
   };
@@ -29,6 +30,7 @@ export const BreakoutDemo: React.FC = () => {
     done: false,
     info: {
       lives: 5,
+      score: 0,
       episode_frame_number: 0,
       frame_number: 0
     }
@@ -51,7 +53,15 @@ export const BreakoutDemo: React.FC = () => {
       }
 
       const data = await response.json();
-      setGameState(data);
+      setGameState({
+        ...data,
+        info: {
+          lives: data.info?.lives ?? 5,
+          score: data.info?.score ?? 0,
+          episode_frame_number: data.info?.episode_frame_number ?? 0,
+          frame_number: data.info?.frame_number ?? 0
+        }
+      });
       setSessionId(newSessionId);
       setIsPlaying(true);
     } catch (error) {
@@ -62,6 +72,7 @@ export const BreakoutDemo: React.FC = () => {
         done: false,
         info: {
           lives: 5,
+          score: 0,
           episode_frame_number: 0,
           frame_number: 0
         }
@@ -78,10 +89,18 @@ export const BreakoutDemo: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action, use_ai: useAI }),
+        body: JSON.stringify({ action, use_ai: useAI, session_id: sessionId }),
       });
       const newState = await response.json();
-      setGameState(newState);
+      setGameState({
+        ...newState,
+        info: {
+          lives: newState.info?.lives ?? gameState.info.lives,
+          score: newState.info?.score ?? gameState.info.score,
+          episode_frame_number: newState.info?.episode_frame_number ?? gameState.info.episode_frame_number,
+          frame_number: newState.info?.frame_number ?? gameState.info.frame_number
+        }
+      });
 
       if (newState.done) {
         setIsPlaying(false);
@@ -186,11 +205,11 @@ export const BreakoutDemo: React.FC = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-gray-600">Lives</p>
-            <p className="font-mono">{gameState.info.lives}</p>
+            <p className="font-mono">{gameState?.info?.lives ?? 5}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Score</p>
-            <p className="font-mono">{gameState.reward}</p>
+            <p className="font-mono">{gameState?.info?.score ?? 0}</p>
           </div>
         </div>
         {gameState.done && (
