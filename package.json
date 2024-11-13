@@ -24,6 +24,8 @@
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@tensorflow-models/speech-commands": "^0.5.4",
+    "@tensorflow/tfjs-node": "^4.22.0",
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
