@@ -71,7 +71,10 @@ export default function PalmDemo() {
           </div>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => {
+          console.log('Tab changed to:', value);
+          setActiveTab(value);
+        }} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="text">Text Generation</TabsTrigger>
             <TabsTrigger value="chat">Chat</TabsTrigger>
