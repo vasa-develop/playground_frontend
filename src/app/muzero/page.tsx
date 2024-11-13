@@ -167,15 +167,15 @@ const CartPoleDemo = () => {
                 >
                   Right
                 </button>
-                <div className="inline-flex items-center space-x-2 bg-white px-3 py-2 rounded-md shadow-sm">
+                <div className="inline-flex items-center space-x-2 bg-slate-100 px-4 py-2.5 rounded-lg shadow-sm border border-slate-200">
                   <Switch
                     checked={isContinuousMode}
                     onCheckedChange={setIsContinuousMode}
-                    className="w-[42px] h-[25px] bg-slate-200 rounded-full relative data-[state=checked]:bg-blue-500 outline-none cursor-pointer border-2 border-slate-300"
+                    className="w-[48px] h-[28px] bg-slate-300 rounded-full relative data-[state=checked]:bg-blue-600 outline-none cursor-pointer border-2 border-slate-400 hover:bg-slate-400 transition-colors"
                   >
-                    <span className="block w-[19px] h-[19px] bg-white rounded-full shadow-md transform transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px] translate-x-0.5" />
+                    <span className="block w-[20px] h-[20px] bg-white rounded-full shadow-lg transform transition-transform duration-200 will-change-transform data-[state=checked]:translate-x-[22px] translate-x-0.5" />
                   </Switch>
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-semibold text-slate-700">
                     AI Mode {isContinuousMode ? 'On' : 'Off'}
                   </span>
                 </div>
