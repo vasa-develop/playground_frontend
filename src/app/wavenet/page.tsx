@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { WaveformVisualizer } from "@/components/waveform-visualizer";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function WaveNetDemo(): React.ReactElement {
   const [temperature, setTemperature] = useState<number>(0.8);
@@ -14,11 +15,11 @@ export default function WaveNetDemo(): React.ReactElement {
   const [speed, setSpeed] = useState<number>(1);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [audioUrl, setAudioUrl] = useState<string>();
+  const { toast } = useToast();
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      // TODO: Replace with actual API call
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -31,13 +32,26 @@ export default function WaveNetDemo(): React.ReactElement {
         }),
       });
 
-      if (!response.ok) throw new Error('Generation failed');
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Generation failed');
+      }
+
       setAudioUrl(data.audioUrl);
+      toast({
+        title: "Success",
+        description: "Audio generated successfully!",
+        duration: 3000,
+      });
     } catch (error) {
       console.error('Error generating audio:', error);
-      // TODO: Add proper error handling UI
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to generate audio',
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsGenerating(false);
     }
