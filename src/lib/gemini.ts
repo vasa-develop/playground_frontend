@@ -38,13 +38,17 @@ export async function chatWithModel(messages: { role: 'user' | 'assistant'; cont
 
     // Send only the last message to get the response
     console.log('Sending message to API:', lastUserMessage.content);
-    const result = await chat.sendMessage(lastUserMessage.content);
-    console.log('Received result from API');
-
-    const response = await result.response;
-    console.log('Processed response:', response.text());
-
-    return response.text();
+    try {
+      const result = await chat.sendMessage(lastUserMessage.content);
+      console.log('Received result from API');
+      const response = await result.response;
+      console.log('Processed response:', response.text());
+      return response.text();
+    } catch (error: any) {
+      console.error('Error in API call:', error);
+      const errorMessage = error?.message || 'Unknown error occurred';
+      throw new Error(`Failed to get response from Gemini API: ${errorMessage}`);
+    }
   } catch (error) {
     console.error('Error in chat:', error);
     throw error;
