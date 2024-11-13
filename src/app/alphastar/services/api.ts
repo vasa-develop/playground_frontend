@@ -1,5 +1,7 @@
-export const API_BASE_URL = 'https://3.83.244.93';
-export const WS_BASE_URL = 'wss://3.83.244.93';
+import { config } from '../config';
+
+export const API_BASE_URL = config.backendUrl;
+export const WS_BASE_URL = config.wsUrl;
 
 export interface Unit {
   position: [number, number];

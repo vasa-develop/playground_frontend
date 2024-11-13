@@ -1,4 +1,3 @@
-// Define runtime configuration type
 interface AlphaStarConfig {
   backendUrl: string;
   wsUrl: string;
@@ -17,8 +16,8 @@ const getRuntimeConfig = (): AlphaStarConfig => {
     return window.ALPHASTAR_CONFIG;
   }
   return {
-    backendUrl: 'http://localhost:8000',
-    wsUrl: 'ws://localhost:8000'
+    backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://alphastar-alb-2018657447.us-east-1.elb.amazonaws.com',
+    wsUrl: process.env.NEXT_PUBLIC_WS_URL || 'ws://alphastar-alb-2018657447.us-east-1.elb.amazonaws.com'
   };
 };
 
