@@ -9,10 +9,13 @@ import {
   Flex,
   Button,
   useToast,
+  Divider,
+  VStack,
 } from '@chakra-ui/react';
 import { MatrixInput } from './components/MatrixInput';
 import { AlgorithmSelector } from './components/AlgorithmSelector';
 import { ResultDisplay } from './components/ResultDisplay';
+import { AlgorithmVisualization } from './components/AlgorithmVisualization';
 import { multiplyMatrices, getSupportedDimensions, type MatrixDimensions } from './api/matrix';
 
 export default function AlphaTensorPage() {
@@ -21,6 +24,7 @@ export default function AlphaTensorPage() {
   const [matrixB, setMatrixB] = useState<number[][]>([[0, 0], [0, 0]]);
   const [useModular, setUseModular] = useState(false);
   const [supportedDimensions, setSupportedDimensions] = useState<MatrixDimensions[]>([]);
+  const [showVisualization, setShowVisualization] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{
     result: number[][];
@@ -79,7 +83,7 @@ export default function AlphaTensorPage() {
 
   return (
     <Container maxW="container.xl" py={8}>
-      <Flex direction="column" gap={8}>
+      <VStack spacing={8} align="stretch">
         <Box>
           <Heading as="h1" size="xl" mb={2}>
             AlphaTensor Matrix Multiplication Demo
@@ -89,20 +93,44 @@ export default function AlphaTensorPage() {
           </Text>
         </Box>
 
-        <Flex gap={4} direction={{ base: 'column', md: 'row' }}>
-          <MatrixInput
-            label="Matrix A"
-            matrix={matrixA}
-            onChange={setMatrixA}
-            supportedDimensions={supportedDimensions}
-          />
-          <MatrixInput
-            label="Matrix B"
-            matrix={matrixB}
-            onChange={setMatrixB}
-            supportedDimensions={supportedDimensions}
-          />
-        </Flex>
+        <Button
+          colorScheme="teal"
+          variant="outline"
+          onClick={() => setShowVisualization(!showVisualization)}
+        >
+          {showVisualization ? 'Hide Algorithm Discovery Process' : 'Show Algorithm Discovery Process'}
+        </Button>
+
+        {showVisualization && (
+          <Box>
+            <Heading as="h2" size="lg" mb={4}>
+              Algorithm Discovery Visualization
+            </Heading>
+            <AlgorithmVisualization />
+          </Box>
+        )}
+
+        <Divider />
+
+        <Box>
+          <Heading as="h2" size="lg" mb={4}>
+            Interactive Matrix Multiplication
+          </Heading>
+          <Flex gap={4} direction={{ base: 'column', md: 'row' }}>
+            <MatrixInput
+              label="Matrix A"
+              matrix={matrixA}
+              onChange={setMatrixA}
+              supportedDimensions={supportedDimensions}
+            />
+            <MatrixInput
+              label="Matrix B"
+              matrix={matrixB}
+              onChange={setMatrixB}
+              supportedDimensions={supportedDimensions}
+            />
+          </Flex>
+        </Box>
 
         <AlgorithmSelector
           onModularChange={setUseModular}
@@ -127,7 +155,7 @@ export default function AlphaTensorPage() {
             modularArithmetic={useModular}
           />
         )}
-      </Flex>
+      </VStack>
     </Container>
   );
 }
