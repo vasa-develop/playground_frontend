@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const PROXY_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8010/' : 'https://cors-anywhere.herokuapp.com/';
-const API_BASE_URL = `${PROXY_URL}${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}`;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface MatrixDimensions {
   rows_a: number;
