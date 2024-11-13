@@ -16,7 +16,14 @@ interface GameState {
   done: boolean;
   reward: number;
   suggested_action?: number;
+  termination_reason?: string;
 }
+
+const LunarLanderDemo = () => (
+  <div className="p-4">
+    <p className="text-gray-700">LunarLander Environment Demo (Coming Soon)</p>
+  </div>
+);
 
 const CartPoleDemo = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -26,7 +33,9 @@ const CartPoleDemo = () => {
     pole_angle: 0,
     pole_velocity: 0,
     done: false,
-    reward: 0
+    reward: 0,
+    termination_reason: undefined,
+    suggested_action: undefined
   });
   const [isPlaying, setIsPlaying] = useState(false);
   const [isContinuousMode, setIsContinuousMode] = useState(false);
@@ -54,7 +63,8 @@ const CartPoleDemo = () => {
         pole_velocity: data.pole_velocity,
         done: data.done,
         reward: data.reward,
-        suggested_action: data.suggested_action
+        suggested_action: data.suggested_action,
+        termination_reason: data.termination_reason
       });
       setSessionId(newSessionId);
       setIsPlaying(true);
@@ -67,7 +77,8 @@ const CartPoleDemo = () => {
         pole_velocity: 0,
         done: false,
         reward: 0,
-        suggested_action: undefined
+        suggested_action: undefined,
+        termination_reason: undefined
       });
     }
   };
@@ -142,7 +153,28 @@ const CartPoleDemo = () => {
       </div>
       <div className="p-4 bg-gray-50 rounded-lg">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Environment State</h3>
+          <div className="flex items-center space-x-2">
+            <h3 className="text-lg font-medium">Environment State</h3>
+            <div className="relative group">
+              <button
+                className="w-5 h-5 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 text-sm"
+                aria-label="Game Rules"
+              >
+                ?
+              </button>
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50">
+                <div className="bg-slate-800 text-white p-4 rounded-lg shadow-lg max-w-sm">
+                  <h4 className="font-semibold mb-2">Game Rules</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Game ends if pole tilts beyond ±12 degrees</li>
+                    <li>• Game ends if cart moves off-screen</li>
+                    <li>• Maximum game length is 200 steps</li>
+                    <li>• Reward equals steps completed</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="space-x-4">
             {!isPlaying ? (
               <button
@@ -207,27 +239,23 @@ const CartPoleDemo = () => {
             <p className="font-mono">{typeof gameState?.pole_velocity === 'number' ? gameState.pole_velocity.toFixed(2) : '0.00'}</p>
           </div>
         </div>
+        {gameState.done && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 font-medium">Game Over</p>
+            <p className="text-sm text-red-600 mt-1">{gameState.termination_reason || "Game ended"}</p>
+            <p className="text-sm text-red-600 mt-1">Final score: {gameState.reward} steps</p>
+          </div>
+        )}
         {gameState.suggested_action !== undefined && (
           <div className="mt-4">
             <p className="text-sm text-gray-600">AI Suggestion</p>
             <p className="font-mono">{gameState.suggested_action === 0 ? 'Left' : 'Right'}</p>
           </div>
         )}
-        {gameState.done && (
-          <div className="mt-4 p-4 bg-yellow-100 rounded">
-            <p className="text-yellow-800">Game Over! Final reward: {gameState.reward}</p>
-          </div>
-        )}
       </div>
     </div>
   );
 };
-
-const LunarLanderDemo = () => (
-  <div className="p-4">
-    <p className="text-gray-700">LunarLander Environment Demo (Coming Soon)</p>
-  </div>
-);
 
 export default function MuZeroDemo() {
   return (
