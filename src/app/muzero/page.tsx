@@ -160,19 +160,19 @@ const CartPoleDemo = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-gray-600">Cart Position</p>
-            <p className="font-mono">{gameState.cart_position.toFixed(2)}</p>
+            <p className="font-mono">{typeof gameState?.cart_position === 'number' ? gameState.cart_position.toFixed(2) : '0.00'}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Cart Velocity</p>
-            <p className="font-mono">{gameState.cart_velocity.toFixed(2)}</p>
+            <p className="font-mono">{typeof gameState?.cart_velocity === 'number' ? gameState.cart_velocity.toFixed(2) : '0.00'}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Pole Angle</p>
-            <p className="font-mono">{gameState.pole_angle.toFixed(2)}</p>
+            <p className="font-mono">{typeof gameState?.pole_angle === 'number' ? gameState.pole_angle.toFixed(2) : '0.00'}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Pole Velocity</p>
-            <p className="font-mono">{gameState.pole_velocity.toFixed(2)}</p>
+            <p className="font-mono">{typeof gameState?.pole_velocity === 'number' ? gameState.pole_velocity.toFixed(2) : '0.00'}</p>
           </div>
         </div>
         {gameState.suggested_action !== undefined && (
