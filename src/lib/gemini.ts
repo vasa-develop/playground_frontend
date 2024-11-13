@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
 
 // Initialize the Gemini API with the API key
 const API_KEY = 'AIzaSyB5lS12pKCWQ_ZoiR13eAQ9_o0-QABUBtQ';  // Temporary hardcoded key
@@ -29,7 +29,6 @@ export async function chatWithModel(messages: { role: 'user' | 'assistant'; cont
     const chat = model.startChat();
     console.log('Chat started');
 
-    // Get only the last user message since we're not maintaining chat state on the API side
     const lastUserMessage = messages[messages.length - 1];
     console.log('Last user message:', lastUserMessage);
 
@@ -37,7 +36,6 @@ export async function chatWithModel(messages: { role: 'user' | 'assistant'; cont
       throw new Error('Last message must be from user');
     }
 
-    // Send only the last message to get the response
     console.log('Sending message to API:', lastUserMessage.content);
     try {
       const result = await chat.sendMessage(lastUserMessage.content);
@@ -52,6 +50,53 @@ export async function chatWithModel(messages: { role: 'user' | 'assistant'; cont
     }
   } catch (error) {
     console.error('Error in chat:', error);
+    throw error;
+  }
+}
+
+// Function for image understanding
+export async function analyzeImage(imageFile: File, prompt: string) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+
+    // Convert File to base64
+    const imageData = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(imageFile);
+    });
+
+    // Remove the data URL prefix
+    const base64Image = imageData.split(',')[1];
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Image,
+          mimeType: imageFile.type
+        }
+      }
+    ]);
+
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error('Error analyzing image:', error);
+    throw error;
+  }
+}
+
+// Function for code generation
+export async function generateCode(prompt: string) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const enhancedPrompt = `Generate code for the following request. Please provide clear, well-commented code with explanations: ${prompt}`;
+    const result = await model.generateContent(enhancedPrompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error('Error generating code:', error);
     throw error;
   }
 }

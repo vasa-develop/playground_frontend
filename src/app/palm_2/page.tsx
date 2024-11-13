@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { generateText, chatWithModel } from "@/lib/gemini";
+import { generateText, chatWithModel, analyzeImage, generateCode } from "@/lib/gemini";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -19,6 +19,9 @@ export default function PalmDemo() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [chatHistory, setChatHistory] = React.useState<Message[]>([]);
   const [error, setError] = React.useState<string>('');
+  const [selectedImage, setSelectedImage] = React.useState<File | null>(null);
+  const [imagePrompt, setImagePrompt] = React.useState<string>('');
+  const [codePrompt, setCodePrompt] = React.useState<string>('');
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -51,6 +54,42 @@ export default function PalmDemo() {
     } finally {
       setLoading(false);
       setInput('');
+    }
+  };
+
+  const handleImageAnalysis = async () => {
+    if (!selectedImage || !imagePrompt.trim()) return;
+
+    setError('');
+    setLoading(true);
+
+    try {
+      const result = await analyzeImage(selectedImage, imagePrompt);
+      setResponse(result);
+      setImagePrompt('');
+    } catch (error) {
+      console.error('Error:', error);
+      setError('An error occurred while analyzing the image. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCodeGeneration = async () => {
+    if (!codePrompt.trim()) return;
+
+    setError('');
+    setLoading(true);
+
+    try {
+      const result = await generateCode(codePrompt);
+      setResponse(result);
+      setCodePrompt('');
+    } catch (error) {
+      console.error('Error:', error);
+      setError('An error occurred while generating code. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,15 +217,77 @@ export default function PalmDemo() {
               <CardHeader>
                 <CardTitle>Advanced Features</CardTitle>
                 <CardDescription>
-                  Explore advanced capabilities like image understanding and structured output
+                  Explore advanced capabilities like image understanding and code generation
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Advanced features coming soon...
-                  </p>
-                </div>
+                <Tabs defaultValue="image" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="image">Image Understanding</TabsTrigger>
+                    <TabsTrigger value="code">Code Generation</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="image">
+                    <div className="flex flex-col space-y-4">
+                      <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setSelectedImage(file);
+                            }
+                          }}
+                        />
+                      </div>
+                      {selectedImage && (
+                        <div className="relative w-full max-w-sm">
+                          <img
+                            src={URL.createObjectURL(selectedImage)}
+                            alt="Selected"
+                            className="rounded-lg border"
+                          />
+                        </div>
+                      )}
+                      <Textarea
+                        placeholder="Ask a question about the image..."
+                        value={imagePrompt}
+                        onChange={(e) => setImagePrompt(e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                      <Button
+                        onClick={handleImageAnalysis}
+                        disabled={!selectedImage || !imagePrompt || loading}
+                      >
+                        {loading ? 'Analyzing...' : 'Analyze Image'}
+                      </Button>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="code">
+                    <div className="flex flex-col space-y-4">
+                      <Textarea
+                        placeholder="Describe the code you want to generate..."
+                        value={codePrompt}
+                        onChange={(e) => setCodePrompt(e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                      <Button
+                        onClick={handleCodeGeneration}
+                        disabled={!codePrompt || loading}
+                      >
+                        {loading ? 'Generating...' : 'Generate Code'}
+                      </Button>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                {response && (
+                  <div className="mt-4 p-4 rounded-lg border bg-muted">
+                    <pre className="whitespace-pre-wrap font-mono">{response}</pre>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
