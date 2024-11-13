@@ -20,7 +20,7 @@ export default function WaveNetDemo(): React.ReactElement {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch('https://wavenet-demo-app-p2mfmf6z.devinapps.com/api/generate', {
+      const response = await fetch('http://34.224.102.66:3000/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
