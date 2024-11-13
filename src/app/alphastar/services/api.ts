@@ -42,8 +42,8 @@ export class GameStateManager {
     }
 
     const config = await this.initConfig();
-    console.log('Attempting to connect to:', `${config.wsUrl}/${this.clientId}`);
-    this.ws = new WebSocket(`${config.wsUrl}/${this.clientId}`);
+    console.log('Attempting to connect to:', `${config.wsUrl}/client/${this.clientId}`);
+    this.ws = new WebSocket(`${config.wsUrl}/client/${this.clientId}`);
 
     this.ws.onopen = () => {
       console.log('WebSocket connection established');
