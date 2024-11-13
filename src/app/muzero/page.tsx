@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+const BACKEND_URL = 'http://localhost:8000';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { Separator } from "@radix-ui/react-separator";
 import * as Switch from "@radix-ui/react-switch";
 import CartPoleVisualizer from './components/CartPoleVisualizer';
-import Breakout from './components/Breakout';
+import { Breakout } from './components/Breakout';
 
 interface BreakoutGameState {
   state: number[][][];
@@ -20,7 +21,7 @@ interface BreakoutGameState {
   termination_reason?: string;
 }
 
-const BreakoutDemo = () => {
+export const BreakoutDemo: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [gameState, setGameState] = useState<BreakoutGameState>({
     state: Array(4).fill(Array(84).fill(Array(84).fill(0))),
@@ -204,7 +205,7 @@ const BreakoutDemo = () => {
   );
 };
 
-const BACKEND_URL = 'https://muzero-backend-yaulseqd.fly.dev';
+
 
 interface GameState {
   cart_position: number;
