@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Stack,
@@ -8,7 +8,6 @@ import {
   Input,
   Grid,
   GridItem,
-  Button,
   Select,
   type SelectProps,
 } from '@chakra-ui/react';
@@ -23,32 +22,41 @@ interface MatrixInputProps {
 
 export function MatrixInput({
   label,
-  matrix,
+  matrix: externalMatrix,
   onChange,
   supportedDimensions = []
 }: MatrixInputProps) {
   const [rows, setRows] = useState(2);
   const [cols, setCols] = useState(2);
+  const [internalMatrix, setInternalMatrix] = useState<number[][]>([]);
 
   useEffect(() => {
-    if (!matrix || matrix.length === 0) {
-      const newMatrix = Array(rows)
-        .fill(0)
-        .map(() => Array(cols).fill(0));
-      onChange(newMatrix);
+    const newMatrix = Array(rows)
+      .fill(0)
+      .map(() => Array(cols).fill(0));
+    setInternalMatrix(newMatrix);
+    onChange(newMatrix);
+  }, [rows, cols]);
+
+  useEffect(() => {
+    if (externalMatrix && externalMatrix.length > 0) {
+      setInternalMatrix(externalMatrix);
+      setRows(externalMatrix.length);
+      setCols(externalMatrix[0]?.length || 0);
     }
-  }, [rows, cols, onChange, matrix]);
+  }, [externalMatrix]);
 
   const handleValueChange = (rowIndex: number, colIndex: number, value: string) => {
-    const newMatrix = matrix.map((row, i) =>
+    const newMatrix = internalMatrix.map((row, i) =>
       i === rowIndex ? row.map((cell, j) => (j === colIndex ? Number(value) : cell)) : row
     );
+    setInternalMatrix(newMatrix);
     onChange(newMatrix);
   };
 
   const handleDimensionChange = (dimension: 'rows' | 'cols', value: string) => {
     const numValue = parseInt(value);
-    const currentMatrix = [...matrix];
+    const currentMatrix = [...internalMatrix];
 
     if (dimension === 'rows') {
       setRows(numValue);
@@ -70,6 +78,7 @@ export function MatrixInput({
       });
     }
 
+    setInternalMatrix(currentMatrix);
     onChange(currentMatrix);
   };
 
@@ -145,7 +154,7 @@ export function MatrixInput({
                     <GridItem key={`${rowIndex}-${colIndex}`}>
                       <Input
                         type="number"
-                        value={matrix[rowIndex]?.[colIndex] || 0}
+                        value={internalMatrix[rowIndex]?.[colIndex] || 0}
                         onChange={(e) =>
                           handleValueChange(rowIndex, colIndex, e.target.value)
                         }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -8,39 +8,73 @@ import {
   Text,
   Flex,
   Button,
+  useToast,
 } from '@chakra-ui/react';
 import { MatrixInput } from './components/MatrixInput';
 import { AlgorithmSelector } from './components/AlgorithmSelector';
 import { ResultDisplay } from './components/ResultDisplay';
-
-interface Matrix {
-  rows: number;
-  cols: number;
-  values: number[][];
-}
+import { multiplyMatrices, getSupportedDimensions, type MatrixDimensions } from './api/matrix';
 
 export default function AlphaTensorPage() {
-  const [matrixA, setMatrixA] = useState<Matrix | null>(null);
-  const [matrixB, setMatrixB] = useState<Matrix | null>(null);
+  const toast = useToast();
+  const [matrixA, setMatrixA] = useState<number[][]>([[0, 0], [0, 0]]);
+  const [matrixB, setMatrixB] = useState<number[][]>([[0, 0], [0, 0]]);
   const [useModular, setUseModular] = useState(false);
+  const [supportedDimensions, setSupportedDimensions] = useState<MatrixDimensions[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{
-    matrix: number[][];
-    algorithm: string;
-    operations: number;
+    result: number[][];
+    algorithm_used: string;
+    operations_count: number;
   } | null>(null);
+
+  useEffect(() => {
+    const fetchDimensions = async () => {
+      try {
+        const dimensions = await getSupportedDimensions();
+        setSupportedDimensions(dimensions);
+      } catch (error) {
+        toast({
+          title: 'Error fetching supported dimensions',
+          description: 'Please try again later',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    };
+    fetchDimensions();
+  }, [toast]);
 
   const handleCalculate = async () => {
     if (!matrixA || !matrixB) {
       return;
     }
 
-    // TODO: Add API call to backend here
-    // For now, just show a placeholder result
-    setResult({
-      matrix: [[1, 0], [0, 1]],
-      algorithm: 'Standard',
-      operations: 8,
-    });
+    setIsLoading(true);
+    try {
+      const response = await multiplyMatrices({
+        matrix_a: matrixA,
+        matrix_b: matrixB,
+        use_modular: useModular,
+      });
+
+      setResult({
+        result: response.result,
+        algorithm_used: response.algorithm_used,
+        operations_count: response.operations_count,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error calculating result',
+        description: 'Please check your input and try again',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -58,13 +92,15 @@ export default function AlphaTensorPage() {
         <Flex gap={4} direction={{ base: 'column', md: 'row' }}>
           <MatrixInput
             label="Matrix A"
-            onMatrixChange={setMatrixA}
             matrix={matrixA}
+            onChange={setMatrixA}
+            supportedDimensions={supportedDimensions}
           />
           <MatrixInput
             label="Matrix B"
-            onMatrixChange={setMatrixB}
             matrix={matrixB}
+            onChange={setMatrixB}
+            supportedDimensions={supportedDimensions}
           />
         </Flex>
 
@@ -78,15 +114,16 @@ export default function AlphaTensorPage() {
           size="lg"
           onClick={handleCalculate}
           isDisabled={!matrixA || !matrixB}
+          isLoading={isLoading}
         >
           Calculate
         </Button>
 
         {result && (
           <ResultDisplay
-            result={result.matrix}
-            algorithmUsed={result.algorithm}
-            operationsCount={result.operations}
+            result={result.result}
+            algorithmUsed={result.algorithm_used}
+            operationsCount={result.operations_count}
             modularArithmetic={useModular}
           />
         )}
