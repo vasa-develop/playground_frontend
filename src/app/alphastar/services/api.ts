@@ -1,8 +1,7 @@
-console.log('Backend URL:', process.env.NEXT_PUBLIC_BACKEND_URL);
-console.log('WebSocket URL:', process.env.NEXT_PUBLIC_WS_URL);
+import { config } from '../config';
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-export const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+export const API_BASE_URL = config.backendUrl;
+export const WS_BASE_URL = config.wsUrl;
 
 export interface Unit {
   position: [number, number];
