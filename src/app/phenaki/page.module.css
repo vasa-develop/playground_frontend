@@ -1,0 +1,27 @@
+.container {
+  @apply flex flex-col items-center justify-start min-h-screen p-8;
+}
+
+.title {
+  @apply text-3xl font-bold mb-8;
+}
+
+.card {
+  @apply w-full max-w-2xl p-6;
+}
+
+.content {
+  @apply flex flex-col gap-6;
+}
+
+.inputGroup {
+  @apply flex flex-col gap-2;
+}
+
+.preview {
+  @apply mt-4 p-4 bg-gray-100 rounded-lg;
+}
+
+.preview h3 {
+  @apply text-lg font-semibold;
+}
