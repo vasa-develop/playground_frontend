@@ -5,6 +5,204 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { Separator } from "@radix-ui/react-separator";
 import * as Switch from "@radix-ui/react-switch";
 import CartPoleVisualizer from './components/CartPoleVisualizer';
+import Breakout from './components/Breakout';
+
+interface BreakoutGameState {
+  state: number[][][];
+  reward: number;
+  done: boolean;
+  info: {
+    lives: number;
+    episode_frame_number: number;
+    frame_number: number;
+  };
+  suggested_action?: number;
+  termination_reason?: string;
+}
+
+const BreakoutDemo = () => {
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [gameState, setGameState] = useState<BreakoutGameState>({
+    state: Array(4).fill(Array(84).fill(Array(84).fill(0))),
+    reward: 0,
+    done: false,
+    info: {
+      lives: 5,
+      episode_frame_number: 0,
+      frame_number: 0
+    }
+  });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isContinuousMode, setIsContinuousMode] = useState(false);
+
+  const initializeGame = async () => {
+    try {
+      const newSessionId = `session_${Date.now()}`;
+      const response = await fetch(`${BACKEND_URL}/games/breakout/init`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setGameState(data);
+      setSessionId(newSessionId);
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Failed to initialize game:', error);
+      setGameState({
+        state: Array(4).fill(Array(84).fill(Array(84).fill(0))),
+        reward: 0,
+        done: false,
+        info: {
+          lives: 5,
+          episode_frame_number: 0,
+          frame_number: 0
+        }
+      });
+    }
+  };
+
+  const takeAction = async (action: number, useAI: boolean = false) => {
+    if (!sessionId || !isPlaying) return;
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/games/breakout/step`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action, use_ai: useAI }),
+      });
+      const newState = await response.json();
+      setGameState(newState);
+
+      if (newState.done) {
+        setIsPlaying(false);
+        setSessionId(null);
+      }
+    } catch (error) {
+      console.error('Failed to take action:', error);
+    }
+  };
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isPlaying && isContinuousMode && !gameState.done) {
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      const attemptAction = async () => {
+        try {
+          await takeAction(gameState.suggested_action || 1, true);
+          retryCount = 0;
+        } catch (error) {
+          console.error('Error in continuous mode:', error);
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.log(`Retrying (${retryCount}/${maxRetries})...`);
+          } else {
+            console.error('Max retries reached, stopping continuous mode');
+            setIsContinuousMode(false);
+          }
+        }
+      };
+
+      intervalId = setInterval(attemptAction, 100);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isPlaying, isContinuousMode, gameState.done, gameState.suggested_action]);
+
+  return (
+    <div className="space-y-6">
+      <div className="p-4 bg-white rounded-lg shadow-sm">
+        <Breakout
+          gameState={gameState.state}
+          onAction={takeAction}
+          isAIEnabled={isContinuousMode}
+          onToggleAI={() => setIsContinuousMode(!isContinuousMode)}
+          gameOver={gameState.done}
+          terminationReason={gameState.termination_reason}
+        />
+      </div>
+      <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-lg font-medium">Environment State</h3>
+            <div className="relative group">
+              <button
+                className="w-5 h-5 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 text-sm"
+                aria-label="Game Rules"
+              >
+                ?
+              </button>
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50">
+                <div className="bg-slate-800 text-white p-4 rounded-lg shadow-lg max-w-sm">
+                  <h4 className="font-semibold mb-2">Game Rules</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Break all bricks to win</li>
+                    <li>• Game ends when all lives are lost</li>
+                    <li>• Score points by hitting bricks</li>
+                    <li>• Use paddle to keep the ball in play</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-x-4">
+            {!isPlaying ? (
+              <button
+                onClick={initializeGame}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Start Game
+              </button>
+            ) : (
+              <>
+                {!isContinuousMode && (
+                  <button
+                    onClick={() => takeAction(gameState.suggested_action || 1, true)}
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Use AI Once
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-600">Lives</p>
+            <p className="font-mono">{gameState.info.lives}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Score</p>
+            <p className="font-mono">{gameState.reward}</p>
+          </div>
+        </div>
+        {gameState.done && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 font-medium">Game Over</p>
+            <p className="text-sm text-red-600 mt-1">{gameState.termination_reason || "Game ended"}</p>
+            <p className="text-sm text-red-600 mt-1">Final score: {gameState.reward}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const BACKEND_URL = 'https://muzero-backend-yaulseqd.fly.dev';
 
@@ -283,7 +481,8 @@ export default function MuZeroDemo() {
         </h1>
         <p className="text-gray-600">
           Explore DeepMind&apos;s MuZero algorithm through interactive demonstrations
-          in different environments. Watch as the AI learns to balance the pole in real-time.
+          in different environments. Experience AI mastery in classic games like CartPole,
+          Breakout, and LunarLander. Watch as the AI learns and adapts in real-time.
         </p>
 
         <Separator className="my-4" />
@@ -302,12 +501,21 @@ export default function MuZeroDemo() {
             >
               LunarLander
             </TabsTrigger>
+            <TabsTrigger
+              value="breakout"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-950 data-[state=active]:shadow-sm"
+            >
+              Breakout
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="cartpole" className="mt-6">
             <CartPoleDemo />
           </TabsContent>
           <TabsContent value="lunarlander" className="mt-6">
             <LunarLanderDemo />
+          </TabsContent>
+          <TabsContent value="breakout" className="mt-6">
+            <BreakoutDemo />
           </TabsContent>
         </Tabs>
       </div>
