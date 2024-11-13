@@ -5,9 +5,16 @@ export const config = {
 } as const;
 
 // Validate environment variables at runtime
-if (typeof window !== 'undefined') {
-  console.log('Runtime environment variables:', {
+console.log('Environment Variables:', {
+  NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
+  config: {
     backendUrl: config.backendUrl,
     wsUrl: config.wsUrl,
-  });
+  }
+});
+
+// Ensure we're using the correct URLs
+if (config.backendUrl === 'http://localhost:8000' || config.wsUrl === 'ws://localhost:8000') {
+  console.warn('Using localhost URLs - environment variables may not be set correctly');
 }
