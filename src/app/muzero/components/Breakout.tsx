@@ -1,15 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { useInterval } from 'react-use';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import * as Toggle from '@radix-ui/react-toggle';
-
-// Dynamically import Konva components
-const KonvaStage = dynamic(() => import('react-konva').then((mod) => mod.Stage), { ssr: false });
-const KonvaLayer = dynamic(() => import('react-konva').then((mod) => mod.Layer), { ssr: false });
-const KonvaRect = dynamic(() => import('react-konva').then((mod) => mod.Rect), { ssr: false });
+import React, { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Type definitions for props
 interface BreakoutProps {
@@ -21,90 +14,98 @@ interface BreakoutProps {
   terminationReason?: string;
 }
 
-interface BreakoutProps {
-  gameState: number[][][];
-  onAction: (action: number) => void;
-  isAIEnabled: boolean;
-  onToggleAI: () => void;
-  gameOver: boolean;
-  terminationReason?: string;
-}
+const GAME_WIDTH = 160;
+const GAME_HEIGHT = 210;
+const PADDLE_HEIGHT = 5;
+const PADDLE_WIDTH = 40;
+const BALL_SIZE = 4;
 
-const Breakout: React.FC<BreakoutProps> = ({
+export const Breakout: React.FC<BreakoutProps> = ({
   gameState,
   onAction,
   isAIEnabled,
   onToggleAI,
   gameOver,
-  terminationReason,
+  terminationReason
 }) => {
-  const [paddlePosition, setPaddlePosition] = useState(0);
-  const stageRef = useRef<any>(null);
+  const [keyPressed, setKeyPressed] = useState<{ [key: string]: boolean }>({});
 
-  // Convert grayscale frame to visible elements
-  const renderFrame = (frame: number[][]) => {
-    const elements = [];
-    const scale = 6; // Scale up the 84x84 frame
-
-    for (let y = 0; y < frame.length; y++) {
-      for (let x = 0; x < frame[y].length; x++) {
-        if (frame[y][x] > 0.1) { // Threshold for visibility
-          elements.push(
-            <KonvaRect
-              key={`${x}-${y}`}
-              x={x * scale}
-              y={y * scale}
-              width={scale}
-              height={scale}
-              fill={`rgb(${frame[y][x] * 255}, ${frame[y][x] * 255}, ${frame[y][x] * 255})`}
-            />
-          );
-        }
-      }
-    }
-    return elements;
-  };
-
-  // Handle keyboard controls
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (gameOver || isAIEnabled) return;
-
-      switch (e.key) {
-        case 'ArrowLeft':
-          onAction(3); // Move left
-          setPaddlePosition((prev) => Math.max(prev - 10, 0));
-          break;
-        case 'ArrowRight':
-          onAction(2); // Move right
-          setPaddlePosition((prev) => Math.min(prev + 10, 500));
-          break;
-        case ' ':
-          onAction(1); // Fire/Start
-          break;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        setKeyPressed(prev => ({ ...prev, [e.key]: true }));
+        onAction(e.key === 'ArrowLeft' ? 3 : 2);
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameOver, isAIEnabled, onAction]);
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        setKeyPressed(prev => ({ ...prev, [e.key]: false }));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [onAction]);
+
+  // Convert gameState to visual elements
+  const renderGameState = () => {
+    if (!gameState || !gameState[0]) return null;
+
+    const frame = gameState[0];
+    const normalizedFrame = frame.map(row =>
+      row.map(pixel => Math.min(255, Math.max(0, pixel * 255)))
+    );
+
+    return (
+      <div
+        className="relative bg-black"
+        style={{
+          width: `${GAME_WIDTH}px`,
+          height: `${GAME_HEIGHT}px`,
+          transform: 'scale(2)',
+          transformOrigin: 'top left'
+        }}
+      >
+        {normalizedFrame.map((row, y) =>
+          row.map((pixel, x) =>
+            pixel > 0 && (
+              <div
+                key={`${x}-${y}`}
+                className="absolute bg-white"
+                style={{
+                  left: `${x}px`,
+                  top: `${y}px`,
+                  width: '1px',
+                  height: '1px',
+                  opacity: pixel / 255
+                }}
+              />
+            )
+          )
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 p-4">
       <div className="relative">
-        <KonvaStage width={504} height={504} ref={stageRef}>
-          <KonvaLayer>
-            {gameState && gameState[0] && renderFrame(gameState[0])}
-          </KonvaLayer>
-        </KonvaStage>
-
+        {renderGameState()}
         {gameOver && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <div className="text-white text-2xl font-bold">
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="text-white text-xl font-bold">
               Game Over
               {terminationReason && (
-                <div className="text-sm mt-2 text-gray-300">
-                  {terminationReason}
+                <div className="text-sm mt-2">
+                  Reason: {terminationReason}
                 </div>
               )}
             </div>
@@ -112,42 +113,32 @@ const Breakout: React.FC<BreakoutProps> = ({
         )}
       </div>
 
-      <div className="flex items-center gap-4">
-        <Tooltip.Provider>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <Toggle.Root
-                className={`inline-flex items-center justify-center rounded px-3 py-2 text-sm font-medium ${
-                  isAIEnabled
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-                pressed={isAIEnabled}
-                onPressedChange={onToggleAI}
-              >
-                AI Control
-              </Toggle.Root>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content
-                className="bg-gray-800 text-white px-3 py-2 rounded text-sm"
-                sideOffset={5}
-              >
-                Toggle between AI and manual control
-                <Tooltip.Arrow className="fill-gray-800" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={onToggleAI}
+              variant={isAIEnabled ? "default" : "outline"}
+              className="mt-4"
+            >
+              {isAIEnabled ? "Disable AI" : "Enable AI"}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Toggle between AI and manual control</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-        {!isAIEnabled && (
-          <div className="text-sm text-gray-600">
-            Use arrow keys to move, spacebar to start
-          </div>
-        )}
-      </div>
+      {!isAIEnabled && (
+        <div className="text-sm text-gray-500 mt-2">
+          Use left and right arrow keys to control the paddle
+        </div>
+      )}
     </div>
   );
 };
 
-export default Breakout;
+
+
+
