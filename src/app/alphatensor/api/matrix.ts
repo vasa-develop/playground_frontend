@@ -37,7 +37,8 @@ export const multiplyMatrices = async (
 export const getSupportedDimensions = async (): Promise<MatrixDimensions[]> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/dimensions`);
-    return response.data;
+    // Extract the supported_dimensions array from the response
+    return response.data.supported_dimensions || [];
   } catch (error) {
     console.error('Error getting supported dimensions:', error);
     throw error;
