@@ -1,5 +1,6 @@
-const BACKEND_URL = typeof window !== 'undefined' && window.__NEXT_DATA__?.props?.pageProps?.env?.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-const WS_URL = typeof window !== 'undefined' && window.__NEXT_DATA__?.props?.pageProps?.env?.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+// Hardcoded backend URLs for demo purposes
+const BACKEND_URL = 'https://3.83.244.93';
+const WS_URL = 'wss://3.83.244.93';
 
 export const config = {
   backendUrl: BACKEND_URL,
@@ -10,12 +11,11 @@ export const config = {
 if (typeof window !== 'undefined') {
   console.log('Runtime Configuration:', {
     backendUrl: config.backendUrl,
-    wsUrl: config.wsUrl,
-    window_next_data: typeof window !== 'undefined' ? window.__NEXT_DATA__ : null
+    wsUrl: config.wsUrl
   });
 }
 
 // Ensure we're using the correct URLs
-if (config.backendUrl === 'http://localhost:8000' || config.wsUrl === 'ws://localhost:8000') {
-  console.warn('Using localhost URLs - environment variables may not be set correctly');
+if (config.backendUrl.includes('localhost') || config.wsUrl.includes('localhost')) {
+  console.warn('Using localhost URLs - this should not happen in production');
 }
