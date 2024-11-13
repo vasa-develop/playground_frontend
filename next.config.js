@@ -2,9 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Configure for app directory
-  experimental: {
-    appDir: true,
+  output: 'export',
+  // Remove deprecated appDir option as it's enabled by default now
+  images: {
+    unoptimized: true
   }
 }
 
