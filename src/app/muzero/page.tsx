@@ -125,7 +125,7 @@ const CartPoleDemo = () => {
     if (isPlaying && isContinuousMode && !gameState.done) {
       intervalId = setInterval(() => {
         takeAction(gameState.suggested_action || 0, true);
-      }, 1000); // Poll every second
+      }, 100); // Poll every 100ms (10 times per second)
     }
 
     return () => {
