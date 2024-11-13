@@ -1,93 +1,132 @@
 'use client';
 
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import {
   Box,
-  FormControl,
-  FormLabel,
-  NumberInput,
-  NumberInputField,
-  Grid,
-  Button,
-  VStack,
-  HStack,
+  Stack,
   Text,
+  Input,
+  Grid,
+  GridItem,
+  Button,
+  Select,
+  type SelectProps,
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
-
-interface Matrix {
-  rows: number;
-  cols: number;
-  values: number[][];
-}
+import { type MatrixDimensions } from '../api/matrix';
 
 interface MatrixInputProps {
   label: string;
-  onMatrixChange: (matrix: Matrix | null) => void;
-  matrix: Matrix | null;
+  matrix: number[][];
+  onChange: (matrix: number[][]) => void;
+  supportedDimensions?: MatrixDimensions[];
 }
 
-export function MatrixInput({ label, onMatrixChange, matrix }: MatrixInputProps) {
+export function MatrixInput({
+  label,
+  matrix,
+  onChange,
+  supportedDimensions = []
+}: MatrixInputProps) {
   const [rows, setRows] = useState(2);
   const [cols, setCols] = useState(2);
-  const [values, setValues] = useState<number[][]>([]);
 
   useEffect(() => {
-    // Initialize matrix with zeros
-    const newValues = Array(rows)
-      .fill(0)
-      .map(() => Array(cols).fill(0));
-    setValues(newValues);
-    onMatrixChange({ rows, cols, values: newValues });
-  }, [rows, cols]);
+    if (!matrix || matrix.length === 0) {
+      const newMatrix = Array(rows)
+        .fill(0)
+        .map(() => Array(cols).fill(0));
+      onChange(newMatrix);
+    }
+  }, [rows, cols, onChange, matrix]);
 
   const handleValueChange = (rowIndex: number, colIndex: number, value: string) => {
-    const newValues = [...values];
-    newValues[rowIndex][colIndex] = parseFloat(value) || 0;
-    setValues(newValues);
-    onMatrixChange({ rows, cols, values: newValues });
+    const newMatrix = matrix.map((row, i) =>
+      i === rowIndex ? row.map((cell, j) => (j === colIndex ? Number(value) : cell)) : row
+    );
+    onChange(newMatrix);
   };
 
-  const handleDimensionChange = (dimension: 'rows' | 'cols', value: number) => {
-    const newValue = Math.max(1, Math.min(5, value));
+  const handleDimensionChange = (dimension: 'rows' | 'cols', value: string) => {
+    const numValue = parseInt(value);
+    const currentMatrix = [...matrix];
+
     if (dimension === 'rows') {
-      setRows(newValue);
+      setRows(numValue);
+      if (numValue > currentMatrix.length) {
+        while (currentMatrix.length < numValue) {
+          currentMatrix.push(Array(cols).fill(0));
+        }
+      } else {
+        currentMatrix.splice(numValue);
+      }
     } else {
-      setCols(newValue);
+      setCols(numValue);
+      currentMatrix.forEach((row, i) => {
+        if (numValue > row.length) {
+          currentMatrix[i] = [...row, ...Array(numValue - row.length).fill(0)];
+        } else {
+          currentMatrix[i] = row.slice(0, numValue);
+        }
+      });
     }
+
+    onChange(currentMatrix);
+  };
+
+  const getDimensionOptions = () => {
+    const options = new Set<number>();
+    if (label === 'Matrix A') {
+      supportedDimensions?.forEach(dim => {
+        options.add(dim.rows_a);
+        options.add(dim.cols_a);
+      });
+    } else {
+      supportedDimensions?.forEach(dim => {
+        options.add(dim.rows_b);
+        options.add(dim.cols_b);
+      });
+    }
+    return Array.from(options).sort((a, b) => a - b);
   };
 
   return (
     <Box p={4} borderWidth="1px" borderRadius="lg" flex="1">
-      <VStack spacing={4} align="stretch">
+      <Stack spacing={4}>
         <Text fontSize="xl" fontWeight="bold">
           {label}
         </Text>
 
-        <HStack spacing={4}>
-          <FormControl>
-            <FormLabel>Rows (1-5)</FormLabel>
-            <NumberInput
-              min={1}
-              max={5}
+        <Stack direction="row" spacing={4}>
+          <Box>
+            <Text mb={2}>Rows</Text>
+            <Select
               value={rows}
-              onChange={(_, value) => handleDimensionChange('rows', value)}
+              onChange={(e) => handleDimensionChange('rows', e.target.value)}
+              data-testid="rows-select"
             >
-              <NumberInputField />
-            </NumberInput>
-          </FormControl>
+              {getDimensionOptions().map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </Select>
+          </Box>
 
-          <FormControl>
-            <FormLabel>Columns (1-5)</FormLabel>
-            <NumberInput
-              min={1}
-              max={5}
+          <Box>
+            <Text mb={2}>Columns</Text>
+            <Select
               value={cols}
-              onChange={(_, value) => handleDimensionChange('cols', value)}
+              onChange={(e) => handleDimensionChange('cols', e.target.value)}
+              data-testid="cols-select"
             >
-              <NumberInputField />
-            </NumberInput>
-          </FormControl>
-        </HStack>
+              {getDimensionOptions().map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </Select>
+          </Box>
+        </Stack>
 
         <Box overflowX="auto">
           <Grid
@@ -103,21 +142,21 @@ export function MatrixInput({ label, onMatrixChange, matrix }: MatrixInputProps)
                 Array(cols)
                   .fill(0)
                   .map((_, colIndex) => (
-                    <NumberInput
-                      key={`${rowIndex}-${colIndex}`}
-                      value={values[rowIndex]?.[colIndex] || 0}
-                      onChange={(valueString) =>
-                        handleValueChange(rowIndex, colIndex, valueString)
-                      }
-                      size="sm"
-                    >
-                      <NumberInputField />
-                    </NumberInput>
+                    <GridItem key={`${rowIndex}-${colIndex}`}>
+                      <Input
+                        type="number"
+                        value={matrix[rowIndex]?.[colIndex] || 0}
+                        onChange={(e) =>
+                          handleValueChange(rowIndex, colIndex, e.target.value)
+                        }
+                        size="sm"
+                      />
+                    </GridItem>
                   ))
               )}
           </Grid>
         </Box>
-      </VStack>
+      </Stack>
     </Box>
   );
 }
