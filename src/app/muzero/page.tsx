@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { Separator } from "@radix-ui/react-separator";
 import { Switch } from "@radix-ui/react-switch";
 import CartPoleVisualizer from './components/CartPoleVisualizer';
+import { Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 
 const BACKEND_URL = 'https://muzero-backend-yaulseqd.fly.dev';
@@ -19,7 +20,6 @@ interface GameState {
   suggested_action?: number;
 }
 
-// Components will be added for different environments
 const CartPoleDemo = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [gameState, setGameState] = useState<GameState>({
@@ -138,90 +138,92 @@ const CartPoleDemo = () => {
   }, [isPlaying, isContinuousMode, gameState.done, gameState.suggested_action]);
 
   return (
-    <div className="space-y-6">
-      <div className="p-4 bg-white rounded-lg shadow-sm">
-        <CartPoleVisualizer state={gameState} />
-      </div>
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Environment State</h3>
-          <div className="space-x-4">
-            {!isPlaying ? (
-              <button
-                onClick={initializeGame}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Start Game
-              </button>
-            ) : (
-              <>
+    <Theme>
+      <div className="space-y-6">
+        <div className="p-4 bg-white rounded-lg shadow-sm">
+          <CartPoleVisualizer state={gameState} />
+        </div>
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium">Environment State</h3>
+            <div className="space-x-4">
+              {!isPlaying ? (
                 <button
-                  onClick={() => takeAction(0)}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  onClick={initializeGame}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                  Left
+                  Start Game
                 </button>
-                <button
-                  onClick={() => takeAction(1)}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                >
-                  Right
-                </button>
-                <div className="inline-flex items-center space-x-2 bg-slate-100 px-4 py-2.5 rounded-lg shadow-sm border border-slate-200">
-                  <Switch
-                    checked={isContinuousMode}
-                    onCheckedChange={setIsContinuousMode}
-                    className="w-[48px] h-[28px] bg-slate-300 rounded-full relative data-[state=checked]:bg-blue-600 outline-none cursor-pointer border-2 border-slate-400 hover:bg-slate-400 transition-colors"
-                  >
-                    <span className="block w-[20px] h-[20px] bg-white rounded-full shadow-lg transform transition-transform duration-200 will-change-transform data-[state=checked]:translate-x-[22px] translate-x-0.5" />
-                  </Switch>
-                  <span className="text-sm font-semibold text-slate-700">
-                    AI Mode {isContinuousMode ? 'On' : 'Off'}
-                  </span>
-                </div>
-                {!isContinuousMode && (
+              ) : (
+                <>
                   <button
-                    onClick={() => takeAction(gameState.suggested_action || 0, true)}
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    onClick={() => takeAction(0)}
+                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                   >
-                    Use AI Once
+                    Left
                   </button>
-                )}
-              </>
-            )}
+                  <button
+                    onClick={() => takeAction(1)}
+                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  >
+                    Right
+                  </button>
+                  <div className="inline-flex items-center space-x-2 bg-slate-100 px-4 py-2.5 rounded-lg shadow-sm border border-slate-200">
+                    <Switch
+                      checked={isContinuousMode}
+                      onCheckedChange={setIsContinuousMode}
+                      className="w-[48px] h-[28px] bg-slate-300 rounded-full relative data-[state=checked]:bg-blue-600 outline-none cursor-pointer border-2 border-slate-400 hover:bg-slate-400 transition-colors"
+                    >
+                      <span className="block w-[20px] h-[20px] bg-white rounded-full shadow-lg transform transition-transform duration-200 will-change-transform data-[state=checked]:translate-x-[22px] translate-x-0.5" />
+                    </Switch>
+                    <span className="text-sm font-semibold text-slate-700">
+                      AI Mode {isContinuousMode ? 'On' : 'Off'}
+                    </span>
+                  </div>
+                  {!isContinuousMode && (
+                    <button
+                      onClick={() => takeAction(gameState.suggested_action || 0, true)}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                      Use AI Once
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Cart Position</p>
+              <p className="font-mono">{typeof gameState?.cart_position === 'number' ? gameState.cart_position.toFixed(2) : '0.00'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Cart Velocity</p>
+              <p className="font-mono">{typeof gameState?.cart_velocity === 'number' ? gameState.cart_velocity.toFixed(2) : '0.00'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Pole Angle</p>
+              <p className="font-mono">{typeof gameState?.pole_angle === 'number' ? gameState.pole_angle.toFixed(2) : '0.00'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Pole Velocity</p>
+              <p className="font-mono">{typeof gameState?.pole_velocity === 'number' ? gameState.pole_velocity.toFixed(2) : '0.00'}</p>
+            </div>
+          </div>
+          {gameState.suggested_action !== undefined && (
+            <div className="mt-4">
+              <p className="text-sm text-gray-600">AI Suggestion</p>
+              <p className="font-mono">{gameState.suggested_action === 0 ? 'Left' : 'Right'}</p>
+            </div>
+          )}
+          {gameState.done && (
+            <div className="mt-4 p-4 bg-yellow-100 rounded">
+              <p className="text-yellow-800">Game Over! Final reward: {gameState.reward}</p>
+            </div>
+          )}
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-600">Cart Position</p>
-            <p className="font-mono">{typeof gameState?.cart_position === 'number' ? gameState.cart_position.toFixed(2) : '0.00'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Cart Velocity</p>
-            <p className="font-mono">{typeof gameState?.cart_velocity === 'number' ? gameState.cart_velocity.toFixed(2) : '0.00'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Pole Angle</p>
-            <p className="font-mono">{typeof gameState?.pole_angle === 'number' ? gameState.pole_angle.toFixed(2) : '0.00'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Pole Velocity</p>
-            <p className="font-mono">{typeof gameState?.pole_velocity === 'number' ? gameState.pole_velocity.toFixed(2) : '0.00'}</p>
-          </div>
-        </div>
-        {gameState.suggested_action !== undefined && (
-          <div className="mt-4">
-            <p className="text-sm text-gray-600">AI Suggestion</p>
-            <p className="font-mono">{gameState.suggested_action === 0 ? 'Left' : 'Right'}</p>
-          </div>
-        )}
-        {gameState.done && (
-          <div className="mt-4 p-4 bg-yellow-100 rounded">
-            <p className="text-yellow-800">Game Over! Final reward: {gameState.reward}</p>
-          </div>
-        )}
       </div>
-    </div>
+    </Theme>
   );
 };
 
