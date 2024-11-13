@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
-import { AudioGenerator } from './audioGenerator';
-import { AudioStorage } from './storage';
 
-const audioGenerator = new AudioGenerator();
-const audioStorage = new AudioStorage();
-
-// Initialize storage directory
-audioStorage.initialize().catch(console.error);
+const BACKEND_URL = 'http://34.224.102.66:3000';
 
 export async function POST(request: Request) {
   try {
@@ -34,19 +28,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate audio
-    const { buffer } = await audioGenerator.generateAudio(temperature, pitch, speed);
+    // Forward request to backend
+    const response = await fetch(`${BACKEND_URL}/api/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ temperature, pitch, speed }),
+    });
 
-    // Save audio file and get URL
-    const audioUrl = await audioStorage.saveAudio(buffer);
+    if (!response.ok) {
+      const error = await response.json();
+      return NextResponse.json(
+        { error: error.detail || 'Failed to generate audio' },
+        { status: response.status }
+      );
+    }
 
+    const data = await response.json();
     return NextResponse.json({
-      audioUrl,
-      parameters: {
-        temperature,
-        pitch,
-        speed
-      }
+      audioUrl: `${BACKEND_URL}${data.audio_url}`,
+      parameters: data.parameters
     });
   } catch (error) {
     console.error('Error generating audio:', error);
