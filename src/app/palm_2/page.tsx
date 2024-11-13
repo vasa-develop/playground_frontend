@@ -34,6 +34,7 @@ export default function PalmDemo() {
     setLoading(true);
 
     try {
+      console.log('Active tab:', activeTab);
       if (activeTab === 'chat') {
         const newUserMessage: Message = { role: 'user', content: input };
         const newHistory = [...chatHistory, newUserMessage];
