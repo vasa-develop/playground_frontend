@@ -28,7 +28,10 @@ const CartPoleVisualizer: React.FC<CartPoleVisualizerProps> = ({ state = { cart_
     const cartY = height - cartHeight - 10;
 
     // Calculate cart position in canvas coordinates
-    const cartX = (width / 2) + (state.cart_position * 50); // Scale position for visibility
+    // Add null checks and default values for all state properties
+    const cartPosition = typeof state?.cart_position === 'number' ? state.cart_position : 0;
+    const poleAngle = typeof state?.pole_angle === 'number' ? state.pole_angle : 0;
+    const cartX = (width / 2) + (cartPosition * 50); // Scale position for visibility
 
     // Draw track
     ctx.beginPath();
@@ -44,8 +47,8 @@ const CartPoleVisualizer: React.FC<CartPoleVisualizerProps> = ({ state = { cart_
     // Draw pole
     ctx.beginPath();
     ctx.moveTo(cartX, cartY);
-    const poleEndX = cartX + Math.sin(state.pole_angle) * poleLength;
-    const poleEndY = cartY - Math.cos(state.pole_angle) * poleLength;
+    const poleEndX = cartX + Math.sin(poleAngle) * poleLength;
+    const poleEndY = cartY - Math.cos(poleAngle) * poleLength;
     ctx.lineTo(poleEndX, poleEndY);
     ctx.strokeStyle = '#2D3748';
     ctx.lineWidth = 6;
