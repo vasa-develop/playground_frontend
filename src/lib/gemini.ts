@@ -57,7 +57,7 @@ export async function chatWithModel(messages: { role: 'user' | 'assistant'; cont
 export async function analyzeImage(imageFile: File, prompt: string) {
   try {
     console.log('Starting image analysis with prompt:', prompt);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-vision" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
     console.log('Model initialized for image analysis');
 
     // Convert File to base64
