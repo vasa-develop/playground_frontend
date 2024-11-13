@@ -35,7 +35,7 @@ export default function PalmDemo() {
 
     try {
       console.log('Active tab:', activeTab);
-      if (activeTab === 'chat') {
+      if (activeTab === 'text-chat') {
         const newUserMessage: Message = { role: 'user', content: input };
         const newHistory = [...chatHistory, newUserMessage];
         const response = await chatWithModel(newHistory);
@@ -78,7 +78,7 @@ export default function PalmDemo() {
         }} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="text">Text Generation</TabsTrigger>
-            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="text-chat">Chat</TabsTrigger>
             <TabsTrigger value="advanced">Advanced Features</TabsTrigger>
           </TabsList>
 
@@ -115,7 +115,7 @@ export default function PalmDemo() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="chat">
+          <TabsContent value="text-chat">
             <Card>
               <CardHeader>
                 <CardTitle>Chat Interface</CardTitle>
