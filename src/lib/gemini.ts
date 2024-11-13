@@ -22,19 +22,13 @@ export async function chatWithModel(messages: { role: 'user' | 'assistant'; cont
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     const chat = model.startChat();
 
-    // Process all messages in the chat history
-    for (const message of messages) {
-      if (message.role === 'user') {
-        await chat.sendMessage(message.content);
-      }
-    }
-
-    // Get the last user message
+    // Get only the last user message since we're not maintaining chat state on the API side
     const lastUserMessage = messages[messages.length - 1];
     if (lastUserMessage.role !== 'user') {
       throw new Error('Last message must be from user');
     }
 
+    // Send only the last message to get the response
     const result = await chat.sendMessage(lastUserMessage.content);
     const response = await result.response;
     return response.text();
