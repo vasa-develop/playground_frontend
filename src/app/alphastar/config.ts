@@ -16,8 +16,8 @@ const getRuntimeConfig = (): AlphaStarConfig => {
     return window.ALPHASTAR_CONFIG;
   }
   return {
-    backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://alphastar-alb-2018657447.us-east-1.elb.amazonaws.com',
-    wsUrl: process.env.NEXT_PUBLIC_WS_URL || 'ws://alphastar-alb-2018657447.us-east-1.elb.amazonaws.com'
+    backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://timely-pavlova-eab52f.netlify.app/api',
+    wsUrl: process.env.NEXT_PUBLIC_WS_URL || 'wss://timely-pavlova-eab52f.netlify.app/ws'
   };
 };
 
