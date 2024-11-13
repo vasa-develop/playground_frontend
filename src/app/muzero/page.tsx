@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { Separator } from "@radix-ui/react-separator";
 import { Switch } from "@radix-ui/react-switch";
 import CartPoleVisualizer from './components/CartPoleVisualizer';
+import '@radix-ui/themes/styles.css';
 
 const BACKEND_URL = 'https://muzero-backend-yaulseqd.fly.dev';
 
@@ -166,13 +167,13 @@ const CartPoleDemo = () => {
                 >
                   Right
                 </button>
-                <div className="inline-flex items-center space-x-2">
+                <div className="inline-flex items-center space-x-2 bg-white px-3 py-2 rounded-md shadow-sm">
                   <Switch
                     checked={isContinuousMode}
                     onCheckedChange={setIsContinuousMode}
-                    className="w-[42px] h-[25px] bg-gray-200 rounded-full relative data-[state=checked]:bg-green-500 outline-none cursor-default"
+                    className="w-[42px] h-[25px] bg-slate-200 rounded-full relative data-[state=checked]:bg-blue-500 outline-none cursor-pointer border-2 border-slate-300"
                   >
-                    <span className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transform transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px] translate-x-0.5 translate-y-0.5" />
+                    <span className="block w-[19px] h-[19px] bg-white rounded-full shadow-md transform transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px] translate-x-0.5" />
                   </Switch>
                   <span className="text-sm font-medium text-gray-700">
                     AI Mode {isContinuousMode ? 'On' : 'Off'}
