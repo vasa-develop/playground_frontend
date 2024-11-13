@@ -7,12 +7,6 @@ const nextConfig = {
     unoptimized: true
   },
   webpack: (config, { isServer }) => {
-    // Use browser version of Konva
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'konva': 'konva/lib/index-react',
-    };
-
     // Exclude canvas from client-side bundling
     if (!isServer) {
       config.resolve.fallback = {
