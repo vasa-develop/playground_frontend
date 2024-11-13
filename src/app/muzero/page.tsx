@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 const BACKEND_URL = 'http://localhost:8000';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
-import { Separator } from "@radix-ui/react-separator";
-import * as Switch from "@radix-ui/react-switch";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import CartPoleVisualizer from './components/CartPoleVisualizer';
 import { Breakout } from './components/Breakout';
 
@@ -414,13 +414,11 @@ const CartPoleDemo = () => {
                   Right
                 </button>
                 <div className="inline-flex items-center space-x-2 bg-slate-100 px-4 py-2.5 rounded-lg shadow-sm border border-slate-200">
-                  <Switch.Root
+                  <Switch
                     checked={isContinuousMode}
                     onCheckedChange={setIsContinuousMode}
-                    className="w-[48px] h-[28px] bg-slate-300 rounded-full relative data-[state=checked]:bg-blue-600 outline-none cursor-pointer border-2 border-slate-400 hover:bg-slate-400 transition-colors"
-                  >
-                    <Switch.Thumb className="block w-[20px] h-[20px] bg-white rounded-full shadow-lg transform transition-transform duration-200 will-change-transform data-[state=checked]:translate-x-[22px] translate-x-0.5" />
-                  </Switch.Root>
+                    className="data-[state=checked]:bg-blue-600"
+                  />
                   <span className="text-sm font-semibold text-slate-700">
                     AI Mode {isContinuousMode ? 'On' : 'Off'}
                   </span>
