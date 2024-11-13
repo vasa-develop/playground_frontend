@@ -1,18 +1,19 @@
-// Environment variables with type safety
+const BACKEND_URL = typeof window !== 'undefined' && window.__NEXT_DATA__?.props?.pageProps?.env?.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+const WS_URL = typeof window !== 'undefined' && window.__NEXT_DATA__?.props?.pageProps?.env?.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+
 export const config = {
-  backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000',
-  wsUrl: process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:8000',
+  backendUrl: BACKEND_URL,
+  wsUrl: WS_URL,
 } as const;
 
-// Validate environment variables at runtime
-console.log('Environment Variables:', {
-  NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
-  NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
-  config: {
+// Log configuration at runtime
+if (typeof window !== 'undefined') {
+  console.log('Runtime Configuration:', {
     backendUrl: config.backendUrl,
     wsUrl: config.wsUrl,
-  }
-});
+    window_next_data: typeof window !== 'undefined' ? window.__NEXT_DATA__ : null
+  });
+}
 
 // Ensure we're using the correct URLs
 if (config.backendUrl === 'http://localhost:8000' || config.wsUrl === 'ws://localhost:8000') {
