@@ -2,10 +2,9 @@
   command = "pnpm run build"
   publish = ".next"
 
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
+[[edge_functions]]
+  path = "/api/generate"
+  function = "generate"
 
 [functions]
   external_node_modules = ["@node-rs/helper"]

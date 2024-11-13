@@ -1,4 +1,17 @@
-export default async (request: Request) => {
+import { Context } from '@netlify/edge-functions';
+
+export default async (request: Request, context: Context) => {
+  // Handle CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    });
+  }
+
   try {
     const body = await request.json();
 
