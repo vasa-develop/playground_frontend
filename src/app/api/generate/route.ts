@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Make request to backend API
-    const response = await fetch('http://34.224.102.66:8080/api/generate', {
+    const response = await fetch('http://34.224.102.66:3000/api/generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     // Update audio URL to include full backend URL
-    data.audio_url = `http://34.224.102.66:8080${data.audio_url}`;
+    data.audio_url = `http://34.224.102.66:3000${data.audio_url}`;
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error:', error);
