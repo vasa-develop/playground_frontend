@@ -1,6 +1,7 @@
 [build]
   command = "pnpm run build"
   publish = ".next"
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
@@ -8,6 +9,7 @@
   status = 200
 
 [functions]
+  node_bundler = "esbuild"
   external_node_modules = ["@node-rs/helper"]
 
 [build.environment]
