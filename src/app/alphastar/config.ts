@@ -1,18 +1,32 @@
-// Hardcoded backend URLs for demo purposes
-const BACKEND_URL = 'https://3.83.244.93';
-const WS_URL = 'wss://3.83.244.93';
+// Define runtime configuration type
+interface AlphaStarConfig {
+  backendUrl: string;
+  wsUrl: string;
+}
 
-export const config = {
-  backendUrl: BACKEND_URL,
-  wsUrl: WS_URL,
-} as const;
+// Declare global window type
+declare global {
+  interface Window {
+    ALPHASTAR_CONFIG?: AlphaStarConfig;
+  }
+}
+
+// Load configuration from public runtime config
+const getRuntimeConfig = (): AlphaStarConfig => {
+  if (typeof window !== 'undefined' && window.ALPHASTAR_CONFIG) {
+    return window.ALPHASTAR_CONFIG;
+  }
+  return {
+    backendUrl: 'http://localhost:8000',
+    wsUrl: 'ws://localhost:8000'
+  };
+};
+
+export const config = getRuntimeConfig();
 
 // Log configuration at runtime
 if (typeof window !== 'undefined') {
-  console.log('Runtime Configuration:', {
-    backendUrl: config.backendUrl,
-    wsUrl: config.wsUrl
-  });
+  console.log('Runtime Configuration:', config);
 }
 
 // Ensure we're using the correct URLs
