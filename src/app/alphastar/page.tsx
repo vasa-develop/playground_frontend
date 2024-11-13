@@ -1,39 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { GameVisualization } from "./components/GameVisualization";
-
-interface GameState {
-  minimap: {
-    height_map: number[][];
-    visibility_map: number[][];
-  };
-  units: Array<{
-    position: [number, number];
-    type: string;
-    health: number;
-  }>;
-}
+import { GameState, gameStateManager } from './services/api';
 
 export default function AlphaStarDemo() {
-  const [gameState, setGameState] = useState<GameState | undefined>();
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  const handleConnect = () => {
-    // TODO: Implement actual game connection
-    setIsConnected(true);
-    // Dummy game state for testing
-    setGameState({
-      minimap: {
-        height_map: Array(128).fill(Array(128).fill(0.5)),
-        visibility_map: Array(128).fill(Array(128).fill(1))
-      },
-      units: [
-        { position: [400, 300], type: 'worker', health: 100 }
-      ]
-    });
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const handleStateUpdate = (newState: GameState) => {
+      setGameState(newState);
+      setIsConnected(newState.connected);
+    };
+
+    gameStateManager.connect(handleStateUpdate);
+
+    // Initial game state fetch
+    gameStateManager.getGameState()
+      .then(handleStateUpdate)
+      .catch(console.error);
+
+    return () => {
+      gameStateManager.disconnect();
+    };
+  }, []);
+
+  const handleConnect = async () => {
+    try {
+      const state = await gameStateManager.getGameState();
+      setGameState(state);
+      setIsConnected(true);
+    } catch (error) {
+      console.error('Failed to connect:', error);
+    }
+  };
+
+  const handleAction = async (action: string) => {
+    try {
+      await gameStateManager.performAction(action);
+    } catch (error) {
+      console.error('Failed to perform action:', error);
+    }
   };
 
   return (
@@ -75,9 +86,18 @@ export default function AlphaStarDemo() {
                   <Button
                     className="w-full"
                     variant="secondary"
+                    onClick={() => handleAction('move')}
                     disabled={!isConnected}
                   >
-                    {isConnected ? 'Select Action' : 'No actions available'}
+                    Move Units
+                  </Button>
+                  <Button
+                    className="w-full"
+                    variant="secondary"
+                    onClick={() => handleAction('attack')}
+                    disabled={!isConnected}
+                  >
+                    Attack
                   </Button>
                 </div>
               </div>
@@ -89,7 +109,7 @@ export default function AlphaStarDemo() {
                 <div className="text-sm text-muted-foreground">
                   <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
                   <p>Units: {gameState?.units?.length ?? '--'}</p>
-                  <p>Resources: --</p>
+                  <p>Current Action: {gameState?.current_action ?? '--'}</p>
                 </div>
               </div>
             </div>

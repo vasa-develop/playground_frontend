@@ -1,19 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { GameState } from '../services/api';
 
 interface GameVisualizationProps {
-  gameState?: {
-    minimap?: {
-      height_map?: number[][];
-      visibility_map?: number[][];
-    };
-    units?: Array<{
-      position: [number, number];
-      type: string;
-      health: number;
-    }>;
-  };
+  gameState: GameState | null;
   className?: string;
 }
 
