@@ -1,11 +1,13 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Configure for app directory
-  experimental: {
-    appDir: true,
+  images: {
+    unoptimized: true
+  },
+  webpack: (config) => {
+    config.externals = [...(config.externals || []), "@tensorflow/tfjs-node"];
+    return config;
   }
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
