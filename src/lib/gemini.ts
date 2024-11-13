@@ -1,7 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize the Gemini API with the API key
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_AI_STUDIO_API_KEY || '');
+const API_KEY = 'AIzaSyB5lS12pKCWQ_ZoiR13eAQ9_o0-QABUBtQ';  // Temporary hardcoded key
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 // Create a client for text generation
 export async function generateText(prompt: string) {
@@ -20,7 +21,7 @@ export async function generateText(prompt: string) {
 export async function chatWithModel(messages: { role: 'user' | 'assistant'; content: string }[]) {
   try {
     console.log('Chat messages received:', messages);
-    console.log('Using API key:', process.env.NEXT_PUBLIC_GOOGLE_AI_STUDIO_API_KEY ? 'Present' : 'Missing');
+    console.log('Using API key:', API_KEY ? 'Present' : 'Missing');
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     console.log('Model initialized');
