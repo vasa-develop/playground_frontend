@@ -63,7 +63,7 @@ export default function PalmDemo() {
           Language Model Playground
         </h1>
         <p className="text-xl text-muted-foreground">
-          Experiment with Google's Gemini language model capabilities
+          Experiment with Google&apos;s Gemini language model capabilities
         </p>
 
         {error && (
@@ -87,7 +87,7 @@ export default function PalmDemo() {
               <CardHeader>
                 <CardTitle>Text Generation</CardTitle>
                 <CardDescription>
-                  Generate text using Gemini's powerful language model
+                  Generate text using Gemini&apos;s powerful language model
                 </CardDescription>
               </CardHeader>
               <CardContent>
