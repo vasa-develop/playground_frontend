@@ -1,0 +1,9 @@
+(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[647],{81135:function(e,r,n){Promise.resolve().then(n.bind(n,36410))},36410:function(e,r,n){"use strict";n.r(r),n.d(r,{default:function(){return FermiNetEnergy}});var t=n(57437);function FermiNetEnergy(){return(0,t.jsxs)("div",{className:"min-h-screen bg-background text-foreground p-8",children:[(0,t.jsx)("h1",{className:"text-4xl font-bold mb-4",children:"FermiNet Energy Visualization"}),(0,t.jsx)("p",{className:"text-lg mb-8",children:"Energy convergence plots during model training with interactive data visualization."}),(0,t.jsx)("div",{className:"text-center text-gray-500",children:"Visualization coming soon..."})]})}},30622:function(e,r,n){"use strict";/**
+ * @license React
+ * react-jsx-runtime.production.min.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */var t=n(2265),i=Symbol.for("react.element"),o=Symbol.for("react.fragment"),s=Object.prototype.hasOwnProperty,a=t.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,c={key:!0,ref:!0,__self:!0,__source:!0};function q(e,r,n){var t,o={},u=null,l=null;for(t in void 0!==n&&(u=""+n),void 0!==r.key&&(u=""+r.key),void 0!==r.ref&&(l=r.ref),r)s.call(r,t)&&!c.hasOwnProperty(t)&&(o[t]=r[t]);if(e&&e.defaultProps)for(t in r=e.defaultProps)void 0===o[t]&&(o[t]=r[t]);return{$$typeof:i,type:e,key:u,ref:l,props:o,_owner:a.current}}r.Fragment=o,r.jsx=q,r.jsxs=q},57437:function(e,r,n){"use strict";e.exports=n(30622)}},function(e){e.O(0,[971,472,744],function(){return e(e.s=81135)}),_N_E=e.O()}]);

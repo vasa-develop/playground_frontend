@@ -1,0 +1,9 @@
+(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[766],{89111:function(e,t,n){Promise.resolve().then(n.bind(n,77469))},77469:function(e,t,n){"use strict";n.r(t),n.d(t,{default:function(){return ObservableQuantities}});var r=n(57437);function ObservableQuantities(){return(0,r.jsxs)("div",{className:"min-h-screen bg-background text-foreground p-8",children:[(0,r.jsx)("h1",{className:"text-4xl font-bold mb-4",children:"Observable Quantities Visualization"}),(0,r.jsx)("p",{className:"text-lg mb-8",children:"Vector fields and density plots for quantum mechanical observable quantities."}),(0,r.jsx)("div",{className:"text-center text-gray-500",children:"Visualization coming soon..."})]})}},30622:function(e,t,n){"use strict";/**
+ * @license React
+ * react-jsx-runtime.production.min.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */var r=n(2265),s=Symbol.for("react.element"),i=Symbol.for("react.fragment"),o=Object.prototype.hasOwnProperty,a=r.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,u={key:!0,ref:!0,__self:!0,__source:!0};function q(e,t,n){var r,i={},c=null,l=null;for(r in void 0!==n&&(c=""+n),void 0!==t.key&&(c=""+t.key),void 0!==t.ref&&(l=t.ref),t)o.call(t,r)&&!u.hasOwnProperty(r)&&(i[r]=t[r]);if(e&&e.defaultProps)for(r in t=e.defaultProps)void 0===i[r]&&(i[r]=t[r]);return{$$typeof:s,type:e,key:c,ref:l,props:i,_owner:a.current}}t.Fragment=i,t.jsx=q,t.jsxs=q},57437:function(e,t,n){"use strict";e.exports=n(30622)}},function(e){e.O(0,[971,472,744],function(){return e(e.s=89111)}),_N_E=e.O()}]);
