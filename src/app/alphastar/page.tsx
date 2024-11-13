@@ -1,15 +1,53 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { GameVisualization } from "./components/GameVisualization";
+
+interface GameState {
+  minimap: {
+    height_map: number[][];
+    visibility_map: number[][];
+  };
+  units: Array<{
+    position: [number, number];
+    type: string;
+    health: number;
+  }>;
+}
 
 export default function AlphaStarDemo() {
+  const [gameState, setGameState] = useState<GameState | undefined>();
+  const [isConnected, setIsConnected] = useState(false);
+
+  const handleConnect = () => {
+    // TODO: Implement actual game connection
+    setIsConnected(true);
+    // Dummy game state for testing
+    setGameState({
+      minimap: {
+        height_map: Array(128).fill(Array(128).fill(0.5)),
+        visibility_map: Array(128).fill(Array(128).fill(1))
+      },
+      units: [
+        { position: [400, 300], type: 'worker', health: 100 }
+      ]
+    });
+  };
+
   return (
     <main className="container mx-auto py-8 px-4">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">AlphaStar Demo</h1>
-          <Button variant="outline">Connect to Game</Button>
+          <Button
+            variant="outline"
+            onClick={handleConnect}
+            disabled={isConnected}
+          >
+            {isConnected ? 'Connected' : 'Connect to Game'}
+          </Button>
         </div>
 
         <Separator />
@@ -21,9 +59,7 @@ export default function AlphaStarDemo() {
               <h3 className="text-2xl font-semibold leading-none tracking-tight">Game Visualization</h3>
             </div>
             <div className="p-6">
-              <div className="aspect-video bg-slate-900 rounded-lg flex items-center justify-center">
-                <p className="text-slate-500">Game visualization will appear here</p>
-              </div>
+              <GameVisualization gameState={gameState} />
             </div>
           </div>
 
@@ -36,8 +72,12 @@ export default function AlphaStarDemo() {
               <div className="space-y-2">
                 <h4 className="font-semibold">Available Actions</h4>
                 <div className="space-y-2">
-                  <Button className="w-full" variant="secondary" disabled>
-                    No actions available
+                  <Button
+                    className="w-full"
+                    variant="secondary"
+                    disabled={!isConnected}
+                  >
+                    {isConnected ? 'Select Action' : 'No actions available'}
                   </Button>
                 </div>
               </div>
@@ -47,8 +87,8 @@ export default function AlphaStarDemo() {
               <div className="space-y-2">
                 <h4 className="font-semibold">Game State</h4>
                 <div className="text-sm text-muted-foreground">
-                  <p>Status: Disconnected</p>
-                  <p>Units: --</p>
+                  <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
+                  <p>Units: {gameState?.units?.length ?? '--'}</p>
                   <p>Resources: --</p>
                 </div>
               </div>
