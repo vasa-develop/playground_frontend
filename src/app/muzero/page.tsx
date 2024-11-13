@@ -505,7 +505,7 @@ export default function MuZeroDemo() {
 
         <Separator className="my-4" />
 
-        <Tabs defaultValue="cartpole" className="w-full">
+        <Tabs defaultValue="breakout" className="w-full">
           <TabsList className="flex h-10 items-center justify-start rounded-md bg-slate-100 p-1">
             <TabsTrigger
               value="cartpole"
