@@ -81,6 +81,19 @@ export default function PhenakiDemo() {
     <div className={styles.container}>
       <h1 className="text-4xl font-bold mb-8">Phenaki Video Processing Demo</h1>
 
+      <Card className="p-6 mb-6 bg-muted">
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Demo Limitations & Information</h2>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Maximum file size: 50MB</li>
+            <li>Videos larger than 1MB will be automatically compressed for processing</li>
+            <li>Supported formats: MP4, WebM, MOV</li>
+            <li>Processing time may vary based on video size and complexity</li>
+            <li>The demo applies a basic edge detection effect to demonstrate the processing pipeline</li>
+          </ul>
+        </div>
+      </Card>
+
       <Card className="p-6">
         <div className="space-y-6">
           <div className="space-y-2">
