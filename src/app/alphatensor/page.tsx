@@ -15,7 +15,7 @@ import {
 import { MatrixInput } from './components/MatrixInput';
 import { AlgorithmSelector } from './components/AlgorithmSelector';
 import { ResultDisplay } from './components/ResultDisplay';
-import { AlgorithmVisualization } from './components/AlgorithmVisualization';
+import AlgorithmVisualization from './components/AlgorithmVisualization';
 import { multiplyMatrices, getSupportedDimensions, type MatrixDimensions } from './api/matrix';
 
 export default function AlphaTensorPage() {
