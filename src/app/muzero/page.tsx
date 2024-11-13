@@ -29,6 +29,7 @@ const CartPoleDemo = () => {
     reward: 0
   });
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isContinuousMode, setIsContinuousMode] = useState(false);
 
   // Initialize game
   const initializeGame = async () => {
@@ -117,6 +118,23 @@ const CartPoleDemo = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isPlaying, gameState.suggested_action]);
 
+  // Handle continuous AI mode
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isPlaying && isContinuousMode && !gameState.done) {
+      intervalId = setInterval(() => {
+        takeAction(gameState.suggested_action || 0, true);
+      }, 1000); // Poll every second
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isPlaying, isContinuousMode, gameState.done, gameState.suggested_action]);
+
   return (
     <div className="space-y-6">
       <div className="p-4 bg-white rounded-lg shadow-sm">
@@ -148,11 +166,19 @@ const CartPoleDemo = () => {
                   Right
                 </button>
                 <button
-                  onClick={() => takeAction(gameState.suggested_action || 0, true)}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  onClick={() => setIsContinuousMode(!isContinuousMode)}
+                  className={`px-4 py-2 ${isContinuousMode ? 'bg-green-600' : 'bg-green-500'} text-white rounded hover:bg-green-600`}
                 >
-                  Use AI
+                  {isContinuousMode ? 'Stop AI' : 'Start AI'}
                 </button>
+                {!isContinuousMode && (
+                  <button
+                    onClick={() => takeAction(gameState.suggested_action || 0, true)}
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Use AI Once
+                  </button>
+                )}
               </>
             )}
           </div>
