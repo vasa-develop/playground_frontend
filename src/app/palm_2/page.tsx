@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { generateText, chatWithModel } from "@/lib/gemini";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -17,6 +18,7 @@ export default function PalmDemo() {
   const [response, setResponse] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const [chatHistory, setChatHistory] = React.useState<Message[]>([]);
+  const [error, setError] = React.useState<string>('');
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -28,25 +30,26 @@ export default function PalmDemo() {
   const handleSubmit = async () => {
     if (!input.trim()) return;
 
-    try {
-      setLoading(true);
-      // TODO: Replace with actual Gemini API call
-      const mockResponse = `This is a simulated response to: "${input}"`;
+    setError('');
+    setLoading(true);
 
+    try {
       if (activeTab === 'chat') {
-        setChatHistory(prev => [...prev,
-          { role: 'user', content: input },
-          { role: 'assistant', content: mockResponse }
-        ]);
+        const newUserMessage: Message = { role: 'user', content: input };
+        const newHistory = [...chatHistory, newUserMessage];
+        const response = await chatWithModel(newHistory);
+        const newAssistantMessage: Message = { role: 'assistant', content: response };
+        setChatHistory([...newHistory, newAssistantMessage]);
       } else {
-        setResponse(mockResponse);
+        const generatedText = await generateText(input);
+        setResponse(generatedText);
       }
-      setInput('');
     } catch (error) {
       console.error('Error:', error);
-      setResponse('An error occurred while processing your request.');
+      setError('An error occurred while processing your request. Please try again.');
     } finally {
       setLoading(false);
+      setInput('');
     }
   };
 
@@ -61,6 +64,12 @@ export default function PalmDemo() {
         <p className="text-xl text-muted-foreground">
           Experiment with Google's Gemini language model capabilities
         </p>
+
+        {error && (
+          <div className="p-4 rounded-lg bg-destructive/15 text-destructive">
+            {error}
+          </div>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
@@ -84,6 +93,7 @@ export default function PalmDemo() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     className="min-h-[100px]"
+                    disabled={loading}
                   />
                   <Button
                     onClick={handleSubmit}
@@ -145,12 +155,13 @@ export default function PalmDemo() {
                           handleSubmit();
                         }
                       }}
+                      disabled={loading}
                     />
                     <Button
                       onClick={handleSubmit}
                       disabled={loading || !input.trim()}
                     >
-                      Send
+                      {loading ? '...' : 'Send'}
                     </Button>
                   </div>
                 </div>
