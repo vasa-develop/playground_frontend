@@ -3,7 +3,7 @@
   publish = "out"
 
 [build.environment]
-  NEXT_PUBLIC_BACKEND_URL = "http://alphastar-alb-2018657447.us-east-1.elb.amazonaws.com"
-  NEXT_PUBLIC_WS_URL = "ws://alphastar-alb-2018657447.us-east-1.elb.amazonaws.com"
+  NEXT_PUBLIC_BACKEND_URL = "https://timely-pavlova-eab52f.netlify.app/api"
+  NEXT_PUBLIC_WS_URL = "wss://timely-pavlova-eab52f.netlify.app/ws"
   NODE_VERSION = "18"
   NPM_FLAGS = "--prefix=/dev/null"
