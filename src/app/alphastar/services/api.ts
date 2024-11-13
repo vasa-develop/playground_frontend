@@ -35,8 +35,8 @@ export class GameStateManager {
       return;
     }
 
-    console.log('Attempting to connect to:', `${WS_BASE_URL}/ws/${this.clientId}`);
-    this.ws = new WebSocket(`${WS_BASE_URL}/ws/${this.clientId}`);
+    console.log('Attempting to connect to:', `${WS_BASE_URL}/${this.clientId}`);
+    this.ws = new WebSocket(`${WS_BASE_URL}/${this.clientId}`);
 
     this.ws.onopen = () => {
       console.log('WebSocket connection established');
