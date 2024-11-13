@@ -1,7 +1,4 @@
-import { config } from '../config';
-
-export const API_BASE_URL = config.backendUrl;
-export const WS_BASE_URL = config.wsUrl;
+import { getConfig } from '../config';
 
 export interface Unit {
   position: [number, number];
@@ -24,19 +21,29 @@ export class GameStateManager {
   private clientId: string;
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
+  private config: { backendUrl: string; wsUrl: string } | null = null;
 
   constructor() {
     this.clientId = Math.random().toString(36).substring(7);
   }
 
-  connect(onStateUpdate: (state: GameState) => void): void {
+  private async initConfig() {
+    if (!this.config) {
+      this.config = await getConfig();
+      console.log('Initialized configuration:', this.config);
+    }
+    return this.config;
+  }
+
+  async connect(onStateUpdate: (state: GameState) => void): Promise<void> {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached');
       return;
     }
 
-    console.log('Attempting to connect to:', `${WS_BASE_URL}/${this.clientId}`);
-    this.ws = new WebSocket(`${WS_BASE_URL}/${this.clientId}`);
+    const config = await this.initConfig();
+    console.log('Attempting to connect to:', `${config.wsUrl}/${this.clientId}`);
+    this.ws = new WebSocket(`${config.wsUrl}/${this.clientId}`);
 
     this.ws.onopen = () => {
       console.log('WebSocket connection established');
@@ -83,9 +90,10 @@ export class GameStateManager {
   }
 
   async getGameState(): Promise<GameState> {
-    console.log('Fetching game state from:', `${API_BASE_URL}/game/state`);
+    const config = await this.initConfig();
+    console.log('Fetching game state from:', `${config.backendUrl}/game/state`);
     try {
-      const response = await fetch(`${API_BASE_URL}/game/state`);
+      const response = await fetch(`${config.backendUrl}/game/state`);
       if (!response.ok) {
         throw new Error(`Failed to fetch game state: ${response.status} ${response.statusText}`);
       }
@@ -97,8 +105,9 @@ export class GameStateManager {
   }
 
   async performAction(action: string): Promise<void> {
+    const config = await this.initConfig();
     try {
-      const response = await fetch(`${API_BASE_URL}/game/action/${action}`, {
+      const response = await fetch(`${config.backendUrl}/game/action/${action}`, {
         method: 'POST',
       });
       if (!response.ok) {
