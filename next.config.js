@@ -2,10 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Configure for app directory
-  experimental: {
-    appDir: true,
-  },
   webpack: (config, { isServer }) => {
     // Ignore node-pre-gyp HTML files
     config.module.rules.push({
@@ -16,7 +12,10 @@ const nextConfig = {
 
     if (isServer) {
       // Handle Node.js modules
-      config.externals = [...config.externals, '@tensorflow/tfjs-node'];
+      config.externals = [...config.externals,
+        '@tensorflow/tfjs-node',
+        '@mapbox/node-pre-gyp'
+      ];
     }
 
     return config;
