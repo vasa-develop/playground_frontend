@@ -6,16 +6,20 @@ import { useInterval } from 'react-use';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import * as Toggle from '@radix-ui/react-toggle';
 
-// Dynamically import Konva components with SSR disabled
-const Stage = dynamic(() => import('react-konva').then((mod) => mod.Stage), {
-  ssr: false,
-});
-const Layer = dynamic(() => import('react-konva').then((mod) => mod.Layer), {
-  ssr: false,
-});
-const Rect = dynamic(() => import('react-konva').then((mod) => mod.Rect), {
-  ssr: false,
-});
+// Dynamically import Konva components
+const KonvaStage = dynamic(() => import('react-konva').then((mod) => mod.Stage), { ssr: false });
+const KonvaLayer = dynamic(() => import('react-konva').then((mod) => mod.Layer), { ssr: false });
+const KonvaRect = dynamic(() => import('react-konva').then((mod) => mod.Rect), { ssr: false });
+
+// Type definitions for props
+interface BreakoutProps {
+  gameState: number[][][];
+  onAction: (action: number) => void;
+  isAIEnabled: boolean;
+  onToggleAI: () => void;
+  gameOver: boolean;
+  terminationReason?: string;
+}
 
 interface BreakoutProps {
   gameState: number[][][];
@@ -46,7 +50,7 @@ const Breakout: React.FC<BreakoutProps> = ({
       for (let x = 0; x < frame[y].length; x++) {
         if (frame[y][x] > 0.1) { // Threshold for visibility
           elements.push(
-            <Rect
+            <KonvaRect
               key={`${x}-${y}`}
               x={x * scale}
               y={y * scale}
@@ -88,11 +92,11 @@ const Breakout: React.FC<BreakoutProps> = ({
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative">
-        <Stage width={504} height={504} ref={stageRef}>
-          <Layer>
+        <KonvaStage width={504} height={504} ref={stageRef}>
+          <KonvaLayer>
             {gameState && gameState[0] && renderFrame(gameState[0])}
-          </Layer>
-        </Stage>
+          </KonvaLayer>
+        </KonvaStage>
 
         {gameOver && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
