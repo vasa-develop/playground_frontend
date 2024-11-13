@@ -134,9 +134,26 @@ const CartPoleDemo = () => {
     let intervalId: NodeJS.Timeout;
 
     if (isPlaying && isContinuousMode && !gameState.done) {
-      intervalId = setInterval(() => {
-        takeAction(gameState.suggested_action || 0, true);
-      }, 100); // Poll every 100ms (10 times per second)
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      const attemptAction = async () => {
+        try {
+          await takeAction(gameState.suggested_action || 0, true);
+          retryCount = 0; // Reset retry count on success
+        } catch (error) {
+          console.error('Error in continuous mode:', error);
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.log(`Retrying (${retryCount}/${maxRetries})...`);
+          } else {
+            console.error('Max retries reached, stopping continuous mode');
+            setIsContinuousMode(false);
+          }
+        }
+      };
+
+      intervalId = setInterval(attemptAction, 100); // Poll every 100ms (10 times per second)
     }
 
     return () => {
