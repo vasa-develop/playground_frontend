@@ -54,32 +54,37 @@ export async function chatWithModel(messages: { role: 'user' | 'assistant'; cont
   }
 }
 
-// Function for image understanding
 export async function analyzeImage(imageFile: File, prompt: string) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+    console.log('Starting image analysis with prompt:', prompt);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-vision" });
+    console.log('Model initialized for image analysis');
 
     // Convert File to base64
     const imageData = await new Promise<string>((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
+      reader.onloadend = () => {
+        const base64Data = reader.result as string;
+        resolve(base64Data.split(',')[1]);
+      };
       reader.readAsDataURL(imageFile);
     });
 
-    // Remove the data URL prefix
-    const base64Image = imageData.split(',')[1];
-
-    const result = await model.generateContent([
-      prompt,
+    // Prepare image parts for the API
+    const imageParts = [
       {
         inlineData: {
-          data: base64Image,
+          data: imageData,
           mimeType: imageFile.type
         }
       }
-    ]);
+    ];
 
+    console.log('Sending request to Gemini API');
+    const result = await model.generateContent([prompt, ...imageParts]);
+    console.log('Received response from Gemini API');
     const response = await result.response;
+    console.log('Analysis response:', response.text());
     return response.text();
   } catch (error) {
     console.error('Error analyzing image:', error);
@@ -87,13 +92,17 @@ export async function analyzeImage(imageFile: File, prompt: string) {
   }
 }
 
-// Function for code generation
 export async function generateCode(prompt: string) {
   try {
+    console.log('Starting code generation with prompt:', prompt);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    console.log('Model initialized for code generation');
     const enhancedPrompt = `Generate code for the following request. Please provide clear, well-commented code with explanations: ${prompt}`;
+    console.log('Enhanced prompt:', enhancedPrompt);
     const result = await model.generateContent(enhancedPrompt);
+    console.log('Received result from API');
     const response = await result.response;
+    console.log('Generated code response:', response.text());
     return response.text();
   } catch (error) {
     console.error('Error generating code:', error);
