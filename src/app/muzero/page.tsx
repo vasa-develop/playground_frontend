@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { Separator } from "@radix-ui/react-separator";
+import { Switch } from "@radix-ui/react-switch";
 import CartPoleVisualizer from './components/CartPoleVisualizer';
 
 const BACKEND_URL = 'https://muzero-backend-yaulseqd.fly.dev';
@@ -165,12 +166,18 @@ const CartPoleDemo = () => {
                 >
                   Right
                 </button>
-                <button
-                  onClick={() => setIsContinuousMode(!isContinuousMode)}
-                  className={`px-4 py-2 ${isContinuousMode ? 'bg-green-600' : 'bg-green-500'} text-white rounded hover:bg-green-600`}
-                >
-                  {isContinuousMode ? 'Stop AI' : 'Start AI'}
-                </button>
+                <div className="inline-flex items-center space-x-2">
+                  <Switch
+                    checked={isContinuousMode}
+                    onCheckedChange={setIsContinuousMode}
+                    className="w-[42px] h-[25px] bg-gray-200 rounded-full relative data-[state=checked]:bg-green-500 outline-none cursor-default"
+                  >
+                    <span className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transform transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px] translate-x-0.5 translate-y-0.5" />
+                  </Switch>
+                  <span className="text-sm font-medium text-gray-700">
+                    AI Mode {isContinuousMode ? 'On' : 'Off'}
+                  </span>
+                </div>
                 {!isContinuousMode && (
                   <button
                     onClick={() => takeAction(gameState.suggested_action || 0, true)}
