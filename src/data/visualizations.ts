@@ -3,9 +3,19 @@ import { Project, ProjectCatalog } from '../types';
 export const projectCatalog: ProjectCatalog = {
   mainProjects: [
     {
+      title: "AlphaTensor",
+      description: "AI-driven discovery of efficient algorithms for matrix multiplication.",
+      path: "/alphatensor",
+      topics: ["AI", "Algorithms", "Matrix Multiplication", "DeepMind"],
+      techStack: ["React", "API Integration"],
+      features: ["Interactive visualizations", "Real-time updates", "Algorithm discovery"],
+      isVisualization: true
+    },
+    {
       title: "Evo",
       description: "DNA sequence generation and analysis using evolutionary algorithms",
       path: "/evo",
+      topics: ["AI", "Evolutionary Algorithms", "DNA Sequence Generation", "Arc Institute"],
       techStack: ["React", "API Integration"],
       features: ["DNA Sequence Generation", "Parameter Control", "Real-time Updates"],
       isVisualization: true
@@ -14,6 +24,8 @@ export const projectCatalog: ProjectCatalog = {
       title: "FermiNet",
       description: "Quantum mechanical visualizations and simulations",
       path: "/ferminet",
+      topics: ["Quantum Mechanics", "Visualizations", "Simulations", "DeepMind"],
+      techStack: ["React", "API Integration"],
       subProjects: [
         {
           title: "Electron Density",
@@ -56,6 +68,15 @@ export const projectCatalog: ProjectCatalog = {
           isVisualization: true
         }
       ]
-    }
+    },
+    {
+      title: "MuZero",
+      description: "AI mastering complex games without predefined rules through advanced planning and learning.",
+      path: "/muzero",
+      topics: ["AI", "Algorithms", "Game Playing", "DeepMind"],
+      techStack: ["React", "API Integration"],
+      features: ["Game strategy visualization", "Real-time decision making", "Adaptive learning", "Rule-free gameplay"],
+      isVisualization: true
+    },
   ]
 };
