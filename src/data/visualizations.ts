@@ -71,7 +71,7 @@ export const projectCatalog: ProjectCatalog = {
     },
     {
       title: "MuZero",
-      description: "AI mastering complex games without predefined rules through advanced planning and learning.",
+      description: "AI mastering complex games without predefined rules.",
       path: "/muzero",
       topics: ["AI", "Algorithms", "Game Playing", "DeepMind"],
       techStack: ["React", "API Integration"],
