@@ -1,10 +1,6 @@
-declare global {
-  interface Window {
-    webgazer: any;
-  }
-}
+import type webgazer from '../../types/webgazer';
 
-let webgazer: any = null;
+let webgazerInstance: webgazer.WebGazer | null = null;
 
 export const initWebGazer = async () => {
   try {
@@ -19,17 +15,17 @@ export const initWebGazer = async () => {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
-    if (!webgazer) {
-      webgazer = window.webgazer;
+    if (!webgazerInstance) {
+      webgazerInstance = window.webgazer;
       console.log('Initializing WebGazer...');
-      await webgazer
+      await webgazerInstance
         .setRegression('ridge')
         .setTracker('TFFacemesh')
         .begin();
       console.log('WebGazer initialized successfully');
     }
 
-    return webgazer;
+    return webgazerInstance;
   } catch (error) {
     console.error('WebGazer initialization error:', error);
     throw error;
@@ -38,12 +34,12 @@ export const initWebGazer = async () => {
 
 export const cleanupWebGazer = () => {
   try {
-    if (webgazer?.end) {
-      webgazer.end();
+    if (webgazerInstance?.end) {
+      webgazerInstance.end();
     }
   } catch (error) {
     console.warn('Error during WebGazer cleanup:', error);
   } finally {
-    webgazer = null;
+    webgazerInstance = null;
   }
 }; 
