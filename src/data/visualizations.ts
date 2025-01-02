@@ -78,5 +78,14 @@ export const projectCatalog: ProjectCatalog = {
       features: ["Game strategy visualization", "Real-time decision making", "Adaptive learning", "Rule-free gameplay"],
       isVisualization: true
     },
+    {
+      title: "Eye Tracking Scroll",
+      description: "A webcam-based eye-tracking demo that enables hands-free scrolling through website content.",
+      path: "/eye-tracking",
+      topics: ["BCI", "Eye Tracking", "Human-Computer Interaction", "Accessibility"],
+      techStack: ["Next.js", "WebGazer.js", "Chakra UI", "TypeScript"],
+      features: ["Webcam-based eye tracking", "5-point calibration system", "Automatic scrolling", "Real-time gaze detection"],
+      isVisualization: true
+    }
   ]
 };
