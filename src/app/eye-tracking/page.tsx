@@ -101,9 +101,9 @@ export default function EyeTrackingPage() {
           </ol>
         </section>
 
-        {[1, 2, 3, 4].map((section) => (
-          <section key={section} className={styles.scrollSection}>
-            <h2>Section {section}</h2>
+        {Array.from({ length: 10 }, (_, i) => (
+          <section key={i + 1} className={styles.scrollSection}>
+            <h2>Section {i + 1}</h2>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
           </section>
         ))}
