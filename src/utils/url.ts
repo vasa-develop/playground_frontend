@@ -1,12 +1,15 @@
 export const getBaseUrl = () => {
-  if (process.env.VERCEL_URL) {
-    // Vercel preview deployments
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    // Vercel production deployment
+  const isVercelDeployment = process.env.VERCEL === '1';
+
+  if (isVercelDeployment) {
+    if (process.env.VERCEL_URL) {
+      // Vercel preview deployments 
+      return `https://${process.env.VERCEL_URL}`;
+    }
+    // When VERCEL=1 but VERCEL_URL is not set, it means we're in Vercel production
     return 'https://playground.vasa.bio';
   }
-  // Development
+
+  // Local development
   return 'http://localhost:3001';
 }; 
