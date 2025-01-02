@@ -3,19 +3,14 @@
 import React, { useEffect, useState } from 'react';
 import Script from 'next/script';
 import styles from './styles.module.css';
-
-declare global {
-  interface Window {
-    webgazer: any;
-  }
-}
+import type webgazer from '../../types/webgazer';
 
 export default function EyeTrackingPage() {
   const [isCalibrated, setIsCalibrated] = useState(false);
   const [calibrationPoints, setCalibrationPoints] = useState(0);
 
   useEffect(() => {
-    let webgazer: any = null;
+    let webgazer: webgazer.WebGazer | null = null;
 
     const initWebGazer = async () => {
       try {
@@ -25,7 +20,7 @@ export default function EyeTrackingPage() {
           .setTracker('TFFacemesh')
           .begin();
 
-        webgazer.setGazeListener((data: any) => {
+        webgazer.setGazeListener((data: webgazer.PredictionData | null) => {
           if (data == null || !isCalibrated) return;
 
           const viewportHeight = window.innerHeight;
