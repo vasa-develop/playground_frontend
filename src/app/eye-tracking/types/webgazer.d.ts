@@ -1,10 +1,10 @@
 declare module 'webgazer' {
-  interface WebGazerData {
+  export interface WebGazerData {
     x: number;
     y: number;
   }
 
-  interface WebGazer {
+  export interface WebGazer {
     setGazeListener: (callback: (data: WebGazerData | null, timestamp: number) => void) => WebGazer;
     begin: () => Promise<void>;
     end: () => void;
@@ -17,6 +17,5 @@ declare module 'webgazer' {
   }
 
   const webgazer: WebGazer;
-  export type { WebGazer, WebGazerData };
   export default webgazer;
 }

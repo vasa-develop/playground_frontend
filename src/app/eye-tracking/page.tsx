@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Box, VStack, Text, Progress, useToast } from '@chakra-ui/react';
+import dynamic from 'next/dynamic';
 import type { WebGazer, WebGazerData } from './types';
 import styles from './styles.module.css';
 
@@ -11,12 +12,18 @@ interface EyeTrackingState {
   isLoading: boolean;
 }
 
-export default function EyeTrackingPage(): React.ReactElement {
+function EyeTrackingPage(): React.ReactElement {
   const [pointsCollected, setPointsCollected] = useState<number>(0);
   const [isCalibrated, setIsCalibrated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isBrowser, setIsBrowser] = useState<boolean>(false);
   const webgazerRef = React.useRef<WebGazer | null>(null);
   const toast = useToast();
+
+  // Set isBrowser on mount
+  useEffect(() => {
+    setIsBrowser(typeof window !== 'undefined');
+  }, []);
 
   // Initialize WebGazer
   const initWebGazer = useCallback(async () => {
@@ -57,8 +64,11 @@ export default function EyeTrackingPage(): React.ReactElement {
         throw new Error(`Camera access failed: ${error.message || 'Permission denied'}`);
       }
 
-      // Import and initialize WebGazer
+      // Initialize WebGazer
       console.log('Loading WebGazer module...');
+      if (!isBrowser) {
+        throw new Error('WebGazer can only be initialized in browser environment');
+      }
       const webgazerModule = await import('webgazer');
       webgazerRef.current = webgazerModule.default;
 
@@ -167,6 +177,11 @@ export default function EyeTrackingPage(): React.ReactElement {
     };
   }, [initWebGazer]);
 
+  // Show loading state if not in browser
+  if (!isBrowser) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Box 
       className={styles.eyeTrackingContainer}
@@ -214,3 +229,9 @@ export default function EyeTrackingPage(): React.ReactElement {
     </Box>
   );
 }
+
+// Disable SSR for the entire page
+export default dynamic(() => Promise.resolve(EyeTrackingPage), { 
+  ssr: false,
+  loading: () => <div>Loading eye tracking...</div>
+});
