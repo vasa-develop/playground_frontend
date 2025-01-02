@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import webgazer from 'webgazer';
 
 interface GazeData {
   x: number;
@@ -29,11 +30,53 @@ export const useEyeTracking = (config: EyeTrackingConfig = {}) => {
     error: null,
   });
 
-  // Will be implemented once webgazer is installed
+  const gazeInterval = useRef<number>();
+  const blinkTimeout = useRef<NodeJS.Timeout>();
+  const lastBlinkTime = useRef<number>(0);
+  
   const startTracking = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, error: null, isTracking: true }));
-      // TODO: Initialize webgazer here
+      
+      await webgazer
+        .setRegression('ridge')
+        .setTracker('TF')
+        .begin();
+
+      // Hide video by default
+      webgazer.showVideo(false);
+      webgazer.showFaceOverlay(false);
+      webgazer.showFaceFeedbackBox(false);
+      
+      // Start continuous gaze tracking
+      gazeInterval.current = window.setInterval(() => {
+        webgazer.getCurrentPrediction()
+          .then((prediction: { x: number; y: number } | null) => {
+            if (prediction) {
+              const gazeData: GazeData = {
+                x: prediction.x,
+                y: prediction.y,
+                timestamp: Date.now()
+              };
+              setState(prev => ({ ...prev, currentGaze: gazeData }));
+              config.onGazeUpdate?.(gazeData);
+            }
+          });
+      }, 50); // 20fps update rate
+
+      // Blink detection if enabled
+      if (config.enableBlink) {
+        webgazer.setGazeListener((data: { x: number; y: number } | null) => {
+          if (!data && config.onBlink) {
+            const now = Date.now();
+            // Prevent multiple blink triggers
+            if (now - lastBlinkTime.current > (config.minBlinkDuration || 300)) {
+              lastBlinkTime.current = now;
+              config.onBlink();
+            }
+          }
+        });
+      }
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
@@ -41,16 +84,45 @@ export const useEyeTracking = (config: EyeTrackingConfig = {}) => {
         isTracking: false 
       }));
     }
-  }, []);
+  }, [config]);
 
   const stopTracking = useCallback(() => {
-    // TODO: Stop webgazer tracking
+    if (gazeInterval.current) {
+      clearInterval(gazeInterval.current);
+      gazeInterval.current = undefined;
+    }
+    if (blinkTimeout.current) {
+      clearTimeout(blinkTimeout.current);
+      blinkTimeout.current = undefined;
+    }
+    webgazer.end();
     setState(prev => ({ ...prev, isTracking: false }));
   }, []);
 
   const startCalibration = useCallback(async () => {
     try {
-      // TODO: Implement calibration process
+      await webgazer
+        .setRegression('ridge')
+        .setTracker('TF')
+        .begin();
+
+      // Show video feed during calibration
+      webgazer.showVideo(true);
+      webgazer.showFaceOverlay(true);
+      webgazer.showFaceFeedbackBox(true);
+
+      // Wait for face to be detected
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Face detection timeout')), 10000);
+        const checkFace = setInterval(() => {
+          if (webgazer.isReady()) {
+            clearInterval(checkFace);
+            clearTimeout(timeout);
+            resolve();
+          }
+        }, 100);
+      });
+
       setState(prev => ({ ...prev, isCalibrated: true }));
     } catch (error) {
       setState(prev => ({ 
