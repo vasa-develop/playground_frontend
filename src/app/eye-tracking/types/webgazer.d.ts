@@ -15,5 +15,8 @@ export interface WebGazer {
   resume: () => WebGazer;
 }
 
-declare const webgazer: WebGazer;
-export default webgazer;
+declare module 'webgazer' {
+  export { WebGazer, WebGazerData };
+  const webgazer: WebGazer;
+  export default webgazer;
+}
