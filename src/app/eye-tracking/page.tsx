@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Box, VStack, Text, Progress, useToast } from '@chakra-ui/react';
-import type { WebGazerData } from './types/webgazer';
+import type { WebGazer, WebGazerData } from './types/webgazer';
 import styles from './styles.module.css';
 
 interface EyeTrackingState {
@@ -15,24 +15,56 @@ export default function EyeTrackingPage(): React.ReactElement {
   const [pointsCollected, setPointsCollected] = useState<number>(0);
   const [isCalibrated, setIsCalibrated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const webgazerRef = React.useRef<WebGazer | null>(null);
   const toast = useToast();
 
   // Initialize WebGazer
   const initWebGazer = useCallback(async () => {
     try {
-      // Load WebGazer script dynamically
-      const script = document.createElement('script');
-      script.src = 'https://webgazer.cs.brown.edu/webgazer.js';
-      script.async = true;
-      
-      await new Promise((resolve, reject) => {
-        script.onload = resolve;
-        script.onerror = reject;
-        document.body.appendChild(script);
-      });
+      // Check if mediaDevices is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API not supported in this browser');
+      }
 
-      // Initialize WebGazer
-      await window.webgazer
+      // List available video devices
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      
+      if (videoDevices.length === 0) {
+        throw new Error('No camera devices found');
+      }
+
+      console.log('Available video devices:', videoDevices);
+
+      // Request camera permissions explicitly first
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            facingMode: "user"
+          },
+          audio: false
+        });
+
+        // Keep the stream active
+        const videoTrack = stream.getVideoTracks()[0];
+        if (videoTrack) {
+          console.log('Camera permission granted:', videoTrack.label);
+        }
+      } catch (error: any) {
+        console.error('Camera permission error:', error);
+        throw new Error(`Camera access failed: ${error.message || 'Permission denied'}`);
+      }
+
+      // Import and initialize WebGazer
+      console.log('Loading WebGazer module...');
+      const webgazerModule = await import('webgazer');
+      webgazerRef.current = webgazerModule.default;
+
+      // Initialize WebGazer with debug mode
+      console.log('Initializing WebGazer...');
+      await webgazerRef.current
         .setGazeListener((data: WebGazerData | null) => {
           if (!data || !isCalibrated) return;
 
@@ -59,9 +91,9 @@ export default function EyeTrackingPage(): React.ReactElement {
         .begin();
 
       // Show webcam feed
-      window.webgazer.showVideo(true);
-      window.webgazer.showFaceOverlay(true);
-      window.webgazer.showFaceFeedbackBox(true);
+      webgazerRef.current.showVideo(true);
+      webgazerRef.current.showFaceOverlay(true);
+      webgazerRef.current.showFaceFeedbackBox(true);
 
       setIsLoading(false);
       
@@ -116,8 +148,8 @@ export default function EyeTrackingPage(): React.ReactElement {
 
     // Cleanup on unmount
     return () => {
-      if (window.webgazer) {
-        window.webgazer.end();
+      if (webgazerRef.current) {
+        webgazerRef.current.end();
       }
       clearInterval(styleInterval);
     };
