@@ -90,10 +90,11 @@ export default function EyeTrackingPage(): React.ReactElement {
         })
         .begin();
 
-      // Show webcam feed
+      // Show webcam feed and prediction points
       webgazerRef.current.showVideo(true);
       webgazerRef.current.showFaceOverlay(true);
       webgazerRef.current.showFaceFeedbackBox(true);
+      webgazerRef.current.showPredictionPoints(true);
 
       setIsLoading(false);
       
