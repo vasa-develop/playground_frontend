@@ -66,10 +66,9 @@ export default function EyeTrackingPage() {
 
   return (
     <>
-      <Script 
-        src="https://webgazer.cs.brown.edu/webgazer.js" 
+      <Script
+        src="https://webgazer.cs.brown.edu/webgazer.js"
         strategy="beforeInteractive"
-        onError={() => console.error('Failed to load WebGazer')}
       />
 
       {!isCalibrated && (

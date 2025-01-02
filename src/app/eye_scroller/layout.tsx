@@ -1,8 +1,8 @@
-import { getBaseUrl } from '@/lib/utils';
+import { getBaseUrl } from '@/utils/url';
 import { Metadata } from 'next';
 
 const baseUrl = getBaseUrl();
-const imageUrl = `${baseUrl}/eye-tracking-preview.png`;
+const imageUrl = `${baseUrl}/previews/eye_scroller_preview.png`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
