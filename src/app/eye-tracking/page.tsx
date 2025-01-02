@@ -27,20 +27,24 @@ export default function EyeTrackingPage() {
 
           const viewportHeight = window.innerHeight;
           const scrollThreshold = 0.2;
-          const scrollSpeed = 5;
-          const smoothness = 0.1;
+          const baseScrollSpeed = 2;
+          const maxScrollSpeed = 8;
           
           const topThreshold = viewportHeight * scrollThreshold;
           const bottomThreshold = viewportHeight * (1 - scrollThreshold);
           
           if (data.y < topThreshold) {
+            const distance = topThreshold - data.y;
+            const speed = Math.min(baseScrollSpeed + (distance / topThreshold) * maxScrollSpeed, maxScrollSpeed);
             window.scrollBy({
-              top: -scrollSpeed * (1 + (topThreshold - data.y) / topThreshold),
+              top: -speed,
               behavior: 'smooth'
             });
           } else if (data.y > bottomThreshold) {
+            const distance = data.y - bottomThreshold;
+            const speed = Math.min(baseScrollSpeed + (distance / (viewportHeight - bottomThreshold)) * maxScrollSpeed, maxScrollSpeed);
             window.scrollBy({
-              top: scrollSpeed * (1 + (data.y - bottomThreshold) / topThreshold),
+              top: speed,
               behavior: 'smooth'
             });
           }
