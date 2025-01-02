@@ -27,6 +27,11 @@ function EyeTrackingPage(): React.ReactElement {
 
   // Initialize WebGazer
   const initWebGazer = useCallback(async () => {
+    if (!isBrowser || typeof window === 'undefined') {
+      console.log('Skipping WebGazer initialization - not in browser environment');
+      return;
+    }
+
     try {
       // Check if mediaDevices is supported
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -66,9 +71,6 @@ function EyeTrackingPage(): React.ReactElement {
 
       // Initialize WebGazer
       console.log('Loading WebGazer module...');
-      if (!isBrowser) {
-        throw new Error('WebGazer can only be initialized in browser environment');
-      }
       const webgazerModule = await import('webgazer');
       webgazerRef.current = webgazerModule.default;
 
@@ -153,6 +155,10 @@ function EyeTrackingPage(): React.ReactElement {
 
   // Initialize WebGazer on component mount
   useEffect(() => {
+    if (!isBrowser || typeof window === 'undefined') {
+      return;
+    }
+
     initWebGazer();
 
     // Add styles to WebGazer video container
