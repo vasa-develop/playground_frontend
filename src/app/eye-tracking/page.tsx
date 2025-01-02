@@ -150,6 +150,11 @@ export default function EyeTrackingPage(): React.ReactElement {
       const videoContainer = document.getElementById('webgazerVideoContainer');
       if (videoContainer) {
         videoContainer.className = styles.webgazerVideoContainer;
+        // Ensure overlay settings are maintained after style changes
+        if (webgazerRef.current) {
+          webgazerRef.current.showFaceOverlay(false);
+          webgazerRef.current.showFaceFeedbackBox(false);
+        }
       }
     }, 100);
 
