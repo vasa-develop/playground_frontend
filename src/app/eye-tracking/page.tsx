@@ -1,211 +1,160 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { Box, VStack, Text, Progress, useToast } from '@chakra-ui/react';
-import type { WebGazer, WebGazerData } from 'webgazer';
+import React, { useEffect, useState, useRef } from 'react';
+import { Box, VStack, Text } from '@chakra-ui/react';
 import styles from './styles.module.css';
+import Script from 'next/script';
+import { initWebGazer, cleanupWebGazer } from './webgazer-init';
+import './global.css';
 
-interface EyeTrackingState {
-  pointsCollected: number;
-  isCalibrated: boolean;
-  isLoading: boolean;
-}
+export default function EyeTrackingPage() {
+  const [calibrationPoints, setCalibrationPoints] = useState(0);
+  const [isCalibrated, setIsCalibrated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const webgazerRef = useRef<any>(null);
 
-export default function EyeTrackingPage(): React.ReactElement {
-  const [pointsCollected, setPointsCollected] = useState<number>(0);
-  const [isCalibrated, setIsCalibrated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const webgazerRef = React.useRef<WebGazer | null>(null);
-  const toast = useToast();
-
-  // Initialize WebGazer
-  const initWebGazer = useCallback(async () => {
-    try {
-      // Check if mediaDevices is supported
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera API not supported in this browser');
-      }
-
-      // List available video devices
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      
-      if (videoDevices.length === 0) {
-        throw new Error('No camera devices found');
-      }
-
-      console.log('Available video devices:', videoDevices);
-
-      // Request camera permissions explicitly first
+  useEffect(() => {
+    const setupGazeListener = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            facingMode: "user"
-          },
-          audio: false
-        });
+        setIsLoading(true);
+        setError(null);
+        const webgazer = await initWebGazer();
+        webgazerRef.current = webgazer;
 
-        // Keep the stream active
-        const videoTrack = stream.getVideoTracks()[0];
-        if (videoTrack) {
-          console.log('Camera permission granted:', videoTrack.label);
-        }
-      } catch (error: any) {
-        console.error('Camera permission error:', error);
-        throw new Error(`Camera access failed: ${error.message || 'Permission denied'}`);
-      }
+        webgazer.setGazeListener((data: any) => {
+          if (data == null || !isCalibrated) return;
 
-      // Import and initialize WebGazer
-      console.log('Loading WebGazer module...');
-      const webgazerModule = await import('webgazer');
-      webgazerRef.current = webgazerModule.default;
-
-      // Initialize WebGazer with debug mode
-      console.log('Initializing WebGazer...');
-      await webgazerRef.current
-        .setGazeListener((data: WebGazerData | null) => {
-          if (!data || !isCalibrated) return;
-
-          // Get viewport height and current scroll position
           const viewportHeight = window.innerHeight;
-          const scrollPosition = window.scrollY;
-
-          // Calculate relative Y position
-          const relativeY = data.y / viewportHeight;
-
-          // Scroll based on gaze position
-          if (relativeY < 0.2) {
-            window.scrollTo({
-              top: scrollPosition - 20,
+          const scrollThreshold = 0.2;
+          const scrollSpeed = 5;
+          const smoothness = 0.1;
+          
+          const topThreshold = viewportHeight * scrollThreshold;
+          const bottomThreshold = viewportHeight * (1 - scrollThreshold);
+          
+          if (data.y < topThreshold) {
+            window.scrollBy({
+              top: -scrollSpeed * (1 + (topThreshold - data.y) / topThreshold),
               behavior: 'smooth'
             });
-          } else if (relativeY > 0.8) {
-            window.scrollTo({
-              top: scrollPosition + 20,
+          } else if (data.y > bottomThreshold) {
+            window.scrollBy({
+              top: scrollSpeed * (1 + (data.y - bottomThreshold) / topThreshold),
               behavior: 'smooth'
             });
           }
-        })
-        .begin();
-
-      // Show webcam feed and prediction points
-      webgazerRef.current.showVideo(true);
-      webgazerRef.current.showFaceOverlay(false);
-      webgazerRef.current.showFaceFeedbackBox(false); // Disable face feedback box boundary
-      webgazerRef.current.showPredictionPoints(true);
-
-      // Make cursor dot violet
-      const dotElement = document.getElementById('webgazerGazeDot');
-      if (dotElement) {
-        dotElement.style.background = 'violet';
+        });
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Failed to initialize WebGazer:', err);
+        setError('Failed to initialize eye tracking. Please ensure camera access is allowed and try again.');
+        setIsLoading(false);
       }
+    };
 
-      setIsLoading(false);
-      
-      toast({
-        title: 'WebGazer initialized',
-        description: 'Please calibrate by clicking on 5 different points while looking at them.',
-        status: 'info',
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (error) {
-      console.error('Failed to initialize WebGazer:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to initialize eye tracking. Please ensure camera permissions are granted.',
-        status: 'error',
-        duration: null,
-        isClosable: true,
+    setupGazeListener();
+
+    return () => {
+      cleanupWebGazer();
+    };
+  }, [isCalibrated]);
+
+  const handleCalibrationClick = () => {
+    if (!isCalibrated) {
+      setCalibrationPoints(prev => {
+        const newCount = Math.min(prev + 1, 5);
+        if (newCount >= 5) {
+          setIsCalibrated(true);
+        }
+        return newCount;
       });
     }
-  }, [toast, isCalibrated]);
-
-  // Handle calibration clicks
-  const handleCalibrationClick = useCallback(() => {
-    setPointsCollected((prev: number) => {
-      const newCount = prev + 1;
-      if (newCount >= 5) {
-        setIsCalibrated(true);
-        toast({
-          title: 'Calibration complete',
-          description: 'You can now scroll the page by looking at the top or bottom areas.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-      return newCount;
-    });
-  }, [toast]);
-
-  // Initialize WebGazer on component mount
-  useEffect(() => {
-    initWebGazer();
-
-    // Add styles to WebGazer video container
-    const styleInterval = setInterval(() => {
-      const videoContainer = document.getElementById('webgazerVideoContainer');
-      if (videoContainer) {
-        videoContainer.className = styles.webgazerVideoContainer;
-      }
-    }, 100);
-
-    // Cleanup on unmount
-    return () => {
-      if (webgazerRef.current) {
-        webgazerRef.current.end();
-      }
-      clearInterval(styleInterval);
-    };
-  }, [initWebGazer]);
+  };
 
   return (
-    <Box 
-      className={styles.eyeTrackingContainer}
-      p={8} 
-      onClick={!isCalibrated ? handleCalibrationClick : undefined}
-      cursor={!isCalibrated ? 'pointer' : 'default'}
-    >
-      <VStack spacing={6} align="stretch">
-        <Text fontSize="2xl" fontWeight="bold">
-          Eye Tracking Scroll Demo
-        </Text>
+    <>
+      <Script 
+        src="https://webgazer.cs.brown.edu/webgazer.js" 
+        strategy="beforeInteractive"
+        onError={() => setError('Failed to load eye tracking script')}
+      />
+      <Box className={styles.eyeTrackingContainer}>
+        {error && (
+          <Box 
+            p={4} 
+            bg="red.100" 
+            color="red.900" 
+            borderRadius="md" 
+            mb={4}
+          >
+            {error}
+          </Box>
+        )}
         
-        {isLoading ? (
-          <Text>Initializing eye tracking...</Text>
-        ) : !isCalibrated ? (
-          <>
-            <Text>
-              Please look at your cursor and click on 5 different points on the screen to calibrate.
-            </Text>
-            <Box>
-              <Text mb={2}>Calibration Progress: {pointsCollected}/5 points</Text>
-              <Progress value={(pointsCollected / 5) * 100} />
-            </Box>
-          </>
-        ) : (
-          <Text>
-            Calibration complete! Look at the top or bottom of the page to scroll.
-          </Text>
+        {isLoading && (
+          <Box 
+            position="fixed"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            bg="rgba(0, 0, 0, 0.5)"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            zIndex={1000}
+          >
+            <Text color="white">Initializing eye tracking...</Text>
+          </Box>
         )}
 
-        {/* Sample content for scrolling */}
-        {isCalibrated && (
-          <VStack spacing={4} align="stretch">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <Box key={i} p={4} bg="gray.100" borderRadius="md" className={styles.scrollSection}>
-                <Text>Scroll section {i + 1}</Text>
-                <Text fontSize="sm">
-                  Look at the top or bottom of the page to scroll through this content.
-                </Text>
-              </Box>
-            ))}
-          </VStack>
+        {!isCalibrated && (
+          <Box 
+            position="fixed"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            bg="rgba(0, 0, 0, 0.8)"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            zIndex={1000}
+            onClick={handleCalibrationClick}
+          >
+            <Box bg="white" p={8} borderRadius={8} textAlign="center" maxW="80%">
+              <Text fontSize="2xl" mb={4}>Calibration Required</Text>
+              <Text mb={4}>Please look at the cursor and click a few points on the screen to calibrate the eye tracker.</Text>
+              <Text mb={4}>Click at least 5 different points for better accuracy.</Text>
+              <Text>Points collected: {calibrationPoints}/5</Text>
+            </Box>
+          </Box>
         )}
-      </VStack>
-    </Box>
+
+        <VStack spacing={6} p={8}>
+          <Box p={4} bg="gray.100" borderRadius="md" w="100%">
+            <Text fontSize="2xl">Eye Tracking Scroll Demo</Text>
+            <Text>This demo uses your webcam to track your eye movements and automatically scroll the page.</Text>
+            <Text mt={4}>Instructions:</Text>
+            <VStack align="start" pl={4} mt={2}>
+              <Text>1. Allow camera access when prompted</Text>
+              <Text>2. Follow the calibration instructions</Text>
+              <Text>3. Look towards the bottom of the page to scroll down</Text>
+              <Text>4. Look towards the top of the page to scroll up</Text>
+            </VStack>
+          </Box>
+
+          {/* Scrollable content sections */}
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Box key={i} p={4} bg="gray.100" borderRadius="md" w="100%">
+              <Text fontSize="xl" mb={2}>Section {i + 1}</Text>
+              <Text>This is a scrollable section. Look up or down to scroll through the content.</Text>
+            </Box>
+          ))}
+        </VStack>
+      </Box>
+    </>
   );
 }
