@@ -19,6 +19,21 @@ class Crosshair extends THREE.Object3D {
     
     this.crosshair = this.createRoot();
     this.add (this.crosshair);
+
+    // Add method to window object for WebGazer integration
+    if (typeof window !== 'undefined') {
+      window.updateCrosshair = (x, y) => {
+        if (this.crosshair) {
+          // Convert screen coordinates to rotation angles
+          const angleX = ((x / window.innerWidth) - 0.5) * Math.PI;
+          const angleY = ((y / window.innerHeight) - 0.5) * Math.PI;
+          
+          // Update crosshair rotation
+          this.crosshair.rotation.y = -angleX * 0.5; // Horizontal movement
+          this.crosshair.rotation.x = angleY * 0.5;  // Vertical movement
+        }
+      };
+    }
   }
   
   // It creates de tree's root

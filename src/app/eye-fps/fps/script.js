@@ -284,6 +284,16 @@ $(function () {
   window.addEventListener ("mousewheel", onMouseWheel, true);   // For Chrome an others
   window.addEventListener ("DOMMouseScroll", onMouseWheel, true); // For Firefox
 
+  // Add shoot handler to window object for WebGazer integration
+  if (typeof window !== 'undefined') {
+    window.handleShoot = () => {
+      if (controlsEnabled && enableControls) {
+        scene.dispara();
+        disparando = true;
+      }
+    };
+  }
+
   // create a scene, that will hold all our elements such as objects, cameras and lights.
   scene = new TheScene (renderer.domElement, camera);
   controls = new THREE.PointerLockControls (camera);
