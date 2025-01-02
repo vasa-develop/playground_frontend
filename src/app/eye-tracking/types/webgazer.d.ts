@@ -17,5 +17,5 @@ declare module 'webgazer' {
   }
 
   const webgazer: WebGazer;
-  export { webgazer as default };
+  export default webgazer;
 }
