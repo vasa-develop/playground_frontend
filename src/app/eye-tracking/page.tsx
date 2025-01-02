@@ -33,80 +33,43 @@ function EyeTrackingPage(): React.ReactElement {
     }
 
     try {
-      // Check if mediaDevices is supported
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera API not supported in this browser');
-      }
-
-      // List available video devices
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      
-      if (videoDevices.length === 0) {
-        throw new Error('No camera devices found');
-      }
-
-      console.log('Available video devices:', videoDevices);
-
-      // Request camera permissions explicitly first
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            facingMode: "user"
-          },
-          audio: false
-        });
-
-        // Keep the stream active
-        const videoTrack = stream.getVideoTracks()[0];
-        if (videoTrack) {
-          console.log('Camera permission granted:', videoTrack.label);
-        }
-      } catch (error: any) {
-        console.error('Camera permission error:', error);
-        throw new Error(`Camera access failed: ${error.message || 'Permission denied'}`);
-      }
-
       // Initialize WebGazer
       console.log('Loading WebGazer module...');
       const webgazerModule = await import('webgazer');
       webgazerRef.current = webgazerModule.default;
-
-      // Initialize WebGazer with debug mode
-      console.log('Initializing WebGazer...');
-      await webgazerRef.current
+      
+      // Begin WebGazer's camera initialization and tracking
+      console.log('Starting WebGazer...');
+      if (!webgazerRef.current) {
+        throw new Error('WebGazer not initialized');
+      }
+      
+      await webgazerRef.current.begin();
+      
+      // Configure WebGazer settings after initialization
+      console.log('Configuring WebGazer...');
+      webgazerRef.current
         .setGazeListener((data: WebGazerData | null) => {
           if (!data || !isCalibrated) return;
 
           // Get viewport height and current scroll position
           const viewportHeight = window.innerHeight;
-          const scrollPosition = window.scrollY;
+          const currentScroll = window.scrollY;
 
-          // Calculate relative Y position
-          const relativeY = data.y / viewportHeight;
+          // Calculate relative position in viewport
+          const relativeY = (data.y - currentScroll) / viewportHeight;
 
           // Scroll based on gaze position
           if (relativeY < 0.2) {
-            window.scrollTo({
-              top: scrollPosition - 20,
-              behavior: 'smooth'
-            });
+            window.scrollBy(0, -30); // Scroll up
           } else if (relativeY > 0.8) {
-            window.scrollTo({
-              top: scrollPosition + 20,
-              behavior: 'smooth'
-            });
+            window.scrollBy(0, 30); // Scroll down
           }
         })
-        .begin();
-
-      // Show webcam feed and prediction points
-      webgazerRef.current.showVideo(true);
-      webgazerRef.current.showFaceOverlay(false);
-      webgazerRef.current.showFaceFeedbackBox(false); // Disable face feedback box boundary
-      webgazerRef.current.showPredictionPoints(true);
+        .showVideo(true)
+        .showFaceOverlay(false)
+        .showFaceFeedbackBox(false)
+        .showPredictionPoints(true);
 
       // Make cursor dot violet
       const dotElement = document.getElementById('webgazerGazeDot');
