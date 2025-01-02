@@ -1,5 +1,11 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import webgazer from 'webgazer';
+import type WebGazer from 'webgazer';
+
+let webgazerInstance: typeof WebGazer | null = null;
+
+export const setWebGazerInstance = (instance: typeof WebGazer) => {
+  webgazerInstance = instance;
+};
 
 interface GazeData {
   x: number;
@@ -38,19 +44,28 @@ export const useEyeTracking = (config: EyeTrackingConfig = {}) => {
     try {
       setState(prev => ({ ...prev, error: null, isTracking: true }));
       
-      await webgazer
+      if (!webgazerInstance) {
+        throw new Error('WebGazer not initialized');
+      }
+      await webgazerInstance
         .setRegression('ridge')
         .setTracker('TF')
         .begin();
 
       // Hide video by default
-      webgazer.showVideo(false);
-      webgazer.showFaceOverlay(false);
-      webgazer.showFaceFeedbackBox(false);
+      if (!webgazerInstance) {
+        throw new Error('WebGazer not initialized');
+      }
+      webgazerInstance.showVideo(false);
+      webgazerInstance.showFaceOverlay(false);
+      webgazerInstance.showFaceFeedbackBox(false);
       
       // Start continuous gaze tracking
+      if (!webgazerInstance) {
+        throw new Error('WebGazer not initialized');
+      }
       gazeInterval.current = window.setInterval(() => {
-        webgazer.getCurrentPrediction()
+        webgazerInstance.getCurrentPrediction()
           .then((prediction: { x: number; y: number } | null) => {
             if (prediction) {
               const gazeData: GazeData = {
@@ -95,27 +110,35 @@ export const useEyeTracking = (config: EyeTrackingConfig = {}) => {
       clearTimeout(blinkTimeout.current);
       blinkTimeout.current = undefined;
     }
-    webgazer.end();
+    if (webgazerInstance) {
+      webgazerInstance.end();
+    }
     setState(prev => ({ ...prev, isTracking: false }));
   }, []);
 
   const startCalibration = useCallback(async () => {
     try {
-      await webgazer
+      if (!webgazerInstance) {
+        throw new Error('WebGazer not initialized');
+      }
+      await webgazerInstance
         .setRegression('ridge')
         .setTracker('TF')
         .begin();
 
       // Show video feed during calibration
-      webgazer.showVideo(true);
-      webgazer.showFaceOverlay(true);
-      webgazer.showFaceFeedbackBox(true);
+      if (!webgazerInstance) {
+        throw new Error('WebGazer not initialized');
+      }
+      webgazerInstance.showVideo(true);
+      webgazerInstance.showFaceOverlay(true);
+      webgazerInstance.showFaceFeedbackBox(true);
 
       // Wait for face to be detected
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('Face detection timeout')), 10000);
         const checkFace = setInterval(() => {
-          if (webgazer.isReady()) {
+          if (webgazerInstance && webgazerInstance.isReady()) {
             clearInterval(checkFace);
             clearTimeout(timeout);
             resolve();

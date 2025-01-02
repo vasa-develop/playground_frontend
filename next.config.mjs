@@ -2,9 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'export',
   images: {
     unoptimized: true,
+  },
+  webpack: (config) => {
+    config.experiments = {
+      asyncWebAssembly: true,
+      layers: true,
+    };
+    return config;
   },
 };
 
