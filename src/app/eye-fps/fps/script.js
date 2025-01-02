@@ -213,10 +213,10 @@ $(function () {
 
       if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
 
-        controlsEnabled = true;
-        controls.enabled = true;
+        controlsEnabled = scene.enableControls;
+        controls.enabled = scene.enableControls;
 
-        enableControls = true;
+        enableControls = scene.enableControls;
 
         blocker.style.display = 'none';
 
@@ -287,7 +287,7 @@ $(function () {
   // Add shoot handler to window object for WebGazer integration
   if (typeof window !== 'undefined') {
     window.handleShoot = () => {
-      if (controlsEnabled && enableControls) {
+      if (controlsEnabled && enableControls && scene.enableControls) {
         scene.dispara();
         disparando = true;
       }
@@ -297,6 +297,10 @@ $(function () {
   // create a scene, that will hold all our elements such as objects, cameras and lights.
   scene = new TheScene (renderer.domElement, camera);
   controls = new THREE.PointerLockControls (camera);
+  
+  // Disable controls initially until calibration is complete
+  scene.enableControls = false;
+  controls.enabled = false;
   scene.add( controls.getObject() );
 
   createGUI(true);

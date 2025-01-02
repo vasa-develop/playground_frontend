@@ -7,17 +7,62 @@ export default function EyeFPSGame() {
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const [showCalibration, setShowCalibration] = useState(true);
   const [calibrationStep, setCalibrationStep] = useState(0);
+  const [isCalibrated, setIsCalibrated] = useState(false);
   const [calibrationPoints] = useState([
     { x: '10%', y: '10%' }, { x: '50%', y: '10%' }, { x: '90%', y: '10%' },
     { x: '10%', y: '50%' }, { x: '50%', y: '50%' }, { x: '90%', y: '50%' },
     { x: '10%', y: '90%' }, { x: '50%', y: '90%' }, { x: '90%', y: '90%' }
   ]);
 
+  // Convert percentage to actual pixels for WebGazer
+  const getPixelCoordinates = (point: { x: string; y: string }) => {
+    const x = (parseInt(point.x) / 100) * window.innerWidth;
+    const y = (parseInt(point.y) / 100) * window.innerHeight;
+    return { x, y };
+  };
+
+  const handleCalibrationPoint = (index: number) => {
+    if (typeof window !== 'undefined' && window.webgazer && index < calibrationPoints.length) {
+      // Show face overlay during calibration
+      window.webgazer.showVideo(true);
+      window.webgazer.showFaceOverlay(true);
+      window.webgazer.showFaceFeedback(true);
+
+      // Get pixel coordinates and record the point
+      const point = getPixelCoordinates(calibrationPoints[index]);
+      window.webgazer.recordScreenPosition(point.x, point.y);
+
+      // Update calibration step
+      const nextStep = index + 1;
+      setCalibrationStep(nextStep);
+
+      // If calibration is complete, hide overlays and finish
+      if (nextStep >= calibrationPoints.length) {
+        window.webgazer.showFaceOverlay(false);
+        window.webgazer.showFaceFeedback(false);
+        window.webgazer.showVideo(false);
+        setShowCalibration(false);
+        setIsCalibrated(true);
+        
+        // Enable game controls after calibration
+        if (window.scene && window.controls) {
+          window.scene.enableControls = true;
+          window.controls.enabled = true;
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     // Initialize WebGazer
     const initWebGazer = async () => {
       if (typeof window !== 'undefined' && window.webgazer) {
         try {
+          // Show video and face overlay initially for calibration
+          window.webgazer.showVideo(true);
+          window.webgazer.showFaceOverlay(true);
+          window.webgazer.showFaceFeedback(true);
+
           await window.webgazer.setRegression('ridge')
             .setGazeListener((data: any) => {
               if (data == null) return;
@@ -29,9 +74,9 @@ export default function EyeFPSGame() {
             })
             .begin();
             
-          // Set up blink detection
+          // Set up blink detection (only enabled after calibration)
           window.webgazer.setBlinkListener((blinking: boolean) => {
-            if (blinking && window.handleShoot) {
+            if (blinking && window.handleShoot && isCalibrated) {
               window.handleShoot();
             }
           });
@@ -39,6 +84,7 @@ export default function EyeFPSGame() {
           console.log('WebGazer initialized successfully');
         } catch (error) {
           console.error('Error initializing WebGazer:', error);
+          setShowCalibration(true); // Ensure calibration UI is shown if there's an error
         }
       }
     };
@@ -119,7 +165,7 @@ export default function EyeFPSGame() {
                     : 'bg-white'
                 }`}
                 style={{ left: point.x, top: point.y }}
-                onClick={() => setCalibrationStep(prev => Math.min(prev + 1, 9))}
+                onClick={() => handleCalibrationPoint(index)}
               />
             ))}
           </div>
