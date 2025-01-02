@@ -18,4 +18,4 @@ declare module 'webgazer' {
 
   const webgazer: WebGazer;
   export default webgazer;
-}
+} 

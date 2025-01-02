@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Box, VStack, Text, Progress, useToast } from '@chakra-ui/react';
-import type { WebGazer, WebGazerData } from './types/webgazer';
+import type { WebGazer, WebGazerData } from 'webgazer';
 import styles from './styles.module.css';
 
 interface EyeTrackingState {
