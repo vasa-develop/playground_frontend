@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+  // Enable static HTML export
   output: 'export',
-  images: {
-    unoptimized: true,
-  },
+  
+  // Keep it simple for now - just enable static export
+  // Remove rewrites since they don't work with static export
+  // We can add more config as needed when we run into specific issues
 };
 
 export default nextConfig;

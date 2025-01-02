@@ -26,11 +26,14 @@ export const projectCatalog: ProjectCatalog = {
       path: "/ferminet",
       topics: ["Quantum Mechanics", "Visualizations", "Simulations", "DeepMind"],
       techStack: ["React", "API Integration"],
+      features: ["Interactive quantum simulations", "3D visualizations", "Real-time updates"],
+      isVisualization: true,
       subProjects: [
         {
           title: "Electron Density",
           description: "3D visualization of hydrogen-like orbital electron density with interactive rotation and zoom capabilities.",
           path: "/ferminet/electron_density",
+          topics: ["Quantum Mechanics", "Electron Orbitals", "3D Visualization"],
           techStack: ["Three.js"],
           features: ["3D rotation", "Zoom control", "Dynamic animation"],
           isVisualization: true
@@ -39,6 +42,7 @@ export const projectCatalog: ProjectCatalog = {
           title: "Observable Quantities",
           description: "Vector fields and density plots for quantum mechanical observable quantities.",
           path: "/ferminet/observable_quantities",
+          topics: ["Quantum Mechanics", "Vector Fields", "Observable Quantities"],
           techStack: ["Plotly.js"],
           features: ["Vector field visualization", "Density plots", "Interactive controls"],
           isVisualization: true
@@ -47,6 +51,7 @@ export const projectCatalog: ProjectCatalog = {
           title: "Wavefunction",
           description: "Interactive visualization of quantum wavefunctions and orbitals.",
           path: "/ferminet/wavefunction",
+          topics: ["Quantum Mechanics", "Wavefunctions", "Quantum States"],
           techStack: ["Plotly.js"],
           features: ["Orbital Visualization", "Interactive Controls", "Real-time Updates"],
           isVisualization: true
@@ -55,6 +60,7 @@ export const projectCatalog: ProjectCatalog = {
           title: "Energy",
           description: "Energy convergence plots during model training with interactive data visualization.",
           path: "/ferminet/energy",
+          topics: ["Quantum Mechanics", "Energy States", "Model Training"],
           techStack: ["Plotly.js"],
           features: ["Interactive plots", "Real-time updates", "Data filtering"],
           isVisualization: true
@@ -63,6 +69,7 @@ export const projectCatalog: ProjectCatalog = {
           title: "MCMC Sampling",
           description: "Interactive visualization of Markov Chain Monte Carlo sampling processes.",
           path: "/ferminet/mcmc_sampling",
+          topics: ["Quantum Mechanics", "Monte Carlo Methods", "Statistical Sampling"],
           techStack: ["Plotly.js"],
           features: ["Parameter controls", "3D trajectories", "Real-time updates"],
           isVisualization: true
@@ -78,5 +85,14 @@ export const projectCatalog: ProjectCatalog = {
       features: ["Game strategy visualization", "Real-time decision making", "Adaptive learning", "Rule-free gameplay"],
       isVisualization: true
     },
+    {
+      title: "Eye Tracking Scroll",
+      description: "A webcam-based eye-tracking demo that enables hands-free scrolling through website content.",
+      path: "/eye-tracking",
+      topics: ["BCI", "Eye Tracking", "Human-Computer Interaction", "Accessibility"],
+      techStack: ["Next.js", "WebGazer.js", "Chakra UI", "TypeScript"],
+      features: ["Webcam-based eye tracking", "5-point calibration system", "Automatic scrolling", "Real-time gaze detection"],
+      isVisualization: true
+    }
   ]
 };
