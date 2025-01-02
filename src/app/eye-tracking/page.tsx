@@ -93,8 +93,14 @@ export default function EyeTrackingPage(): React.ReactElement {
       // Show webcam feed and prediction points
       webgazerRef.current.showVideo(true);
       webgazerRef.current.showFaceOverlay(true);
-      webgazerRef.current.showFaceFeedbackBox(true);
+      webgazerRef.current.showFaceFeedbackBox(false); // Disable face feedback box boundary
       webgazerRef.current.showPredictionPoints(true);
+
+      // Make cursor dot violet
+      const dotElement = document.getElementById('webgazerGazeDot');
+      if (dotElement) {
+        dotElement.style.background = 'violet';
+      }
 
       setIsLoading(false);
       

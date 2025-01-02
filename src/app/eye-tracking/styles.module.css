@@ -6,7 +6,6 @@
   width: 320px !important;  /* Half of ideal width (640/2) */
   height: 240px !important; /* Half of ideal height (480/2) */
   z-index: 999 !important;
-  border: 2px solid transparent !important; /* Ensure border doesn't affect size */
 }
 
 /* Eye tracking container styles */
