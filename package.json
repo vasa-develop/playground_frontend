@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.19",
+    "webgazer": "^3.1.0",
     "@chakra-ui/next-js": "^2.1.4",
     "@chakra-ui/react": "^2.7.1",
     "@chakra-ui/system": "^2.5.8",
@@ -52,8 +53,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.17.6",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
     "concurrently": "^9.1.0",
     "cors-anywhere": "^0.4.4",
     "eslint": "^8",
