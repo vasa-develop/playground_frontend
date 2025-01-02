@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eye Tracking Scroll Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+</head>
+<body>
+    <div id="calibration-overlay">
+        <div class="calibration-message">
+            <h2>Calibration Required</h2>
+            <p>Please look at the cursor and click a few points on the screen to calibrate the eye tracker.</p>
+            <p>Click at least 5 different points for better accuracy.</p>
+            <p id="calibration-status">Points collected: 0/5</p>
+        </div>
+    </div>
+
+    <div id="content">
+        <section class="scroll-section">
+            <h1>Eye Tracking Scroll Demo</h1>
+            <p>This demo uses your webcam to track your eye movements and automatically scroll the page.</p>
+            <p>Instructions:</p>
+            <ol>
+                <li>Allow camera access when prompted</li>
+                <li>Follow the calibration instructions</li>
+                <li>Look towards the bottom of the page to scroll down</li>
+                <li>Look towards the top of the page to scroll up</li>
+            </ol>
+        </section>
+
+        <!-- Test content for scrolling -->
+        <section class="scroll-section">
+            <h2>Section 1</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </section>
+
+        <section class="scroll-section">
+            <h2>Section 2</h2>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </section>
+
+        <section class="scroll-section">
+            <h2>Section 3</h2>
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+        </section>
+
+        <section class="scroll-section">
+            <h2>Section 4</h2>
+            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </section>
+    </div>
+
+    <script src="eye-tracker.js"></script>
+</body>
+</html> 
