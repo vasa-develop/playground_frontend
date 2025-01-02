@@ -287,22 +287,9 @@ $(function () {
   // Add shoot handler to window object for WebGazer integration
   if (typeof window !== 'undefined') {
     window.handleShoot = () => {
-      if (controlsEnabled && enableControls && scene && scene.enableControls) {
+      if (controlsEnabled && enableControls && scene.enableControls) {
         scene.dispara();
         disparando = true;
-      }
-    };
-
-    // Add calibration complete handler
-    window.onCalibrationComplete = () => {
-      if (scene) {
-        scene.enableControls = true;
-        if (controls) {
-          controls.enabled = true;
-          enableControls = true;
-          controlsEnabled = true;
-        }
-        console.log('Calibration complete - controls enabled');
       }
     };
   }
@@ -314,8 +301,6 @@ $(function () {
   // Disable controls initially until calibration is complete
   scene.enableControls = false;
   controls.enabled = false;
-  enableControls = false;
-  controlsEnabled = false;
   scene.add( controls.getObject() );
 
   createGUI(true);

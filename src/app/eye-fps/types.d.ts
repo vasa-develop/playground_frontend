@@ -18,6 +18,9 @@ declare global {
     THREE: any;
     updateCrosshair?: (x: number, y: number) => void;
     handleShoot?: () => void;
+    onCalibrationComplete?: () => void;
+    controlsEnabled?: boolean;
+    enableControls?: boolean;
   }
 
   // Extend JSX namespace to include custom attributes

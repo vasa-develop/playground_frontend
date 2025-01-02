@@ -56,69 +56,116 @@ export default function EyeFPSGame() {
   useEffect(() => {
     // Initialize WebGazer
     const initWebGazer = async () => {
-      if (typeof window !== 'undefined' && window.webgazer) {
-        try {
-          // Show video and face overlay initially for calibration
-          window.webgazer.showVideo(true);
-          window.webgazer.showFaceOverlay(true);
-          window.webgazer.showFaceFeedback(true);
+      if (typeof window === 'undefined' || !window.webgazer) {
+        console.error('WebGazer not available');
+        return;
+      }
 
-          await window.webgazer.setRegression('ridge')
-            .setGazeListener((data: any) => {
-              if (data == null) return;
+      try {
+        console.log('Starting WebGazer initialization...');
+          
+        // Initialize WebGazer with basic configuration
+        await window.webgazer.setRegression('ridge');
+        console.log('Regression model set to ridge');
+          
+        // Configure WebGazer UI elements and listeners
+        window.webgazer
+          .showVideo(true)
+          .showFaceOverlay(true)
+          .showFaceFeedback(true)
+          .setGazeListener((data: any) => {
+            if (data == null) {
+              console.log('Received null gaze data');
+              return;
+            }
+            console.log('Received gaze data:', { x: data.x, y: data.y });
               
-              // Update crosshair position based on gaze
-              if (window.updateCrosshair) {
-                window.updateCrosshair(data.x, data.y);
+            // Update crosshair position based on gaze only after calibration
+            if (window.updateCrosshair && isCalibrated) {
+              window.updateCrosshair(data.x, data.y);
+            }
+          })
+          .setBlinkListener((blinking: boolean) => {
+            if (blinking) {
+              console.log('Blink detected');
+              if (window.handleShoot && isCalibrated) {
+                console.log('Shooting triggered by blink');
+                window.handleShoot();
               }
-            })
-            .begin();
-            
-          // Set up blink detection (only enabled after calibration)
-          window.webgazer.setBlinkListener((blinking: boolean) => {
-            if (blinking && window.handleShoot && isCalibrated) {
-              window.handleShoot();
             }
           });
+
+        console.log('WebGazer UI elements and listeners configured');
           
-          console.log('WebGazer initialized successfully');
-        } catch (error) {
-          console.error('Error initializing WebGazer:', error);
-          setShowCalibration(true); // Ensure calibration UI is shown if there's an error
-        }
+        // Begin WebGazer tracking
+        await window.webgazer.begin();
+        console.log('WebGazer tracking started successfully');
+          
+        // Show calibration UI
+        setShowCalibration(true);
+        console.log('Calibration UI displayed');
+      } catch (error) {
+        console.error('Error initializing WebGazer:', error);
+        window.alert('Error initializing eye tracking. Please ensure your browser supports WebGL and camera access is granted.');
+        setShowCalibration(true);
       }
     };
 
+    interface GameScript {
+      src: string;
+      async: boolean;
+    }
+
     // Load game scripts after component mounts
     const loadGame = () => {
-      const scripts = [
-        '/eye-fps/libs/three.js',
-        '/eye-fps/libs/MTLLoader.js',
-        '/eye-fps/libs/OBJLoader.js',
-        '/eye-fps/libs/PointerLockControls.js',
-        '/eye-fps/libs/dat.gui.js',
-        '/eye-fps/libs/stats.js',
-        '/eye-fps/libs/physi.js',
-        '/eye-fps/libs/physijs_worker.js',
-        '/eye-fps/libs/ammo.js',
-        '/eye-fps/libs/howler.js',
-        '/eye-fps/libs/jquery-1.9.0.js',
-        '/eye-fps/fps/Bullets.js',
-        '/eye-fps/fps/Crosshair.js',
-        '/eye-fps/fps/Enemies.js',
-        '/eye-fps/fps/Map.js',
-        '/eye-fps/fps/Skybox.js',
-        '/eye-fps/fps/TheScene.js',
-        '/eye-fps/fps/avatar.js',
-        '/eye-fps/fps/script.js'
+      // Define scripts in order of dependency
+      const scripts: GameScript[] = [
+        { src: '/fps/libs/three.js', async: false },
+        { src: '/fps/libs/MTLLoader.js', async: false },
+        { src: '/fps/libs/OBJLoader.js', async: false },
+        { src: '/fps/libs/PointerLockControls.js', async: false },
+        { src: '/fps/libs/dat.gui.js', async: false },
+        { src: '/fps/libs/stats.js', async: false },
+        { src: '/fps/libs/ammo.js', async: false },
+        { src: '/fps/libs/physi.js', async: false },
+        { src: '/fps/libs/physijs_worker.js', async: false },
+        { src: '/fps/libs/howler.js', async: false },
+        { src: '/fps/libs/jquery-1.9.0.js', async: false },
+        { src: '/fps/Bullets.js', async: false },
+        { src: '/fps/Crosshair.js', async: false },
+        { src: '/fps/Enemies.js', async: false },
+        { src: '/fps/Map.js', async: false },
+        { src: '/fps/Skybox.js', async: false },
+        { src: '/fps/TheScene.js', async: false },
+        { src: '/fps/avatar.js', async: false },
+        { src: '/fps/script.js', async: false }
       ];
 
-      scripts.forEach(src => {
+      // Load scripts sequentially
+      const loadScriptSequentially = (index: number): void => {
+        if (index >= scripts.length) {
+          console.log('All scripts loaded');
+          return;
+        }
+
         const script = document.createElement('script');
-        script.src = src;
-        script.async = true;
+        script.src = scripts[index].src;
+        script.async = scripts[index].async;
+        
+        script.onload = () => {
+          loadScriptSequentially(index + 1);
+        };
+        
+        script.onerror = (error) => {
+          console.error(`Error loading script ${scripts[index].src}:`, error);
+          loadScriptSequentially(index + 1); // Continue loading next script even if one fails
+        };
+
         document.body.appendChild(script);
-      });
+      };
+
+      // Start loading scripts
+      loadScriptSequentially(0);
     };
 
     loadGame();
@@ -126,8 +173,12 @@ export default function EyeFPSGame() {
 
     return () => {
       // Cleanup WebGazer when component unmounts
-      if (window.webgazer) {
-        window.webgazer.end();
+      if (typeof window !== 'undefined' && window.webgazer && typeof window.webgazer.end === 'function') {
+        try {
+          window.webgazer.end();
+        } catch (error) {
+          console.error('Error cleaning up WebGazer:', error);
+        }
       }
     };
   }, []);
