@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Box, VStack, Text, Progress, useToast } from '@chakra-ui/react';
 import type { WebGazerData } from './types/webgazer';
+import styles from './styles.module.css';
 
 interface EyeTrackingState {
   pointsCollected: number;
@@ -105,17 +106,26 @@ export default function EyeTrackingPage(): React.ReactElement {
   useEffect(() => {
     initWebGazer();
 
+    // Add styles to WebGazer video container
+    const styleInterval = setInterval(() => {
+      const videoContainer = document.getElementById('webgazerVideoContainer');
+      if (videoContainer) {
+        videoContainer.className = styles.webgazerVideoContainer;
+      }
+    }, 100);
+
     // Cleanup on unmount
     return () => {
       if (window.webgazer) {
         window.webgazer.end();
       }
+      clearInterval(styleInterval);
     };
   }, [initWebGazer]);
 
   return (
     <Box 
-      className="eye-tracking-container" 
+      className={styles.eyeTrackingContainer}
       p={8} 
       onClick={!isCalibrated ? handleCalibrationClick : undefined}
       cursor={!isCalibrated ? 'pointer' : 'default'}
@@ -147,7 +157,7 @@ export default function EyeTrackingPage(): React.ReactElement {
         {isCalibrated && (
           <VStack spacing={4} align="stretch">
             {Array.from({ length: 20 }).map((_, i) => (
-              <Box key={i} p={4} bg="gray.100" borderRadius="md">
+              <Box key={i} p={4} bg="gray.100" borderRadius="md" className={styles.scrollSection}>
                 <Text>Scroll section {i + 1}</Text>
                 <Text fontSize="sm">
                   Look at the top or bottom of the page to scroll through this content.
